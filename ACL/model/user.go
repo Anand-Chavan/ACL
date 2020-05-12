@@ -1,39 +1,33 @@
 package model
 
-import(
-	"fmt"
-)
-
 type User struct {
-	Name         string `json:"Name" column:"Name"`
-	Id            int64  `json:"Id,omitempty" key:"primary" autoincr:"1" column:"Id"`
-	Password      string `json:"Password" column:"Password"`
-	DateCreation  string `json:"DateCreation,omitempty" key:"primary" autoincr:"1" column:"DateCreation"`
-	UserType      string `json:"UserType" column:"UserType"`
+	Id            int64  `json:"id,omitempty" key:"primary" autoincr:"1" column:"id"`
+	FirstName     string `json:"first_name" column:"first_name"`
+	LastName      string `json:"last_name" column:"last_name"`
+	Email         string `json:"email" column:"email"`
+	Password      string `json:"password" column:"password"`
+	ContactNumber string `json:"contact_number" column:"contact_number"`
+	UpdatedBy     int64  `json:"updated_by" column:"updated_by"`
 }
 
 func (user *User) Table() string {
-	return "users"
+	return "user_detail"
 }
 
 func (user *User) String() string {
 	return Stringify(user)
 }
 
-
-type User struct {
-	Name         string `json:"Name" column:"Name"`
-	Id            int64  `json:"Id,omitempty" key:"primary" autoincr:"1" column:"Id"`
-	Password      string `json:"Password" column:"Password"`
-	DateCreation  string `json:"DateCreation,omitempty" key:"primary" autoincr:"1" column:"DateCreation"`
-	UserType      string `json:"UserType" column:"UserType"`
+type Books struct {
+	Id      int64  `json:"id,omitempty" key:"primary" autoincr:"1" column:"id"`
+	Title   string `json:"title" column:"title"`
+	Content string `json:"content" column:"content"`
 }
 
-func (user *User) Table() string {
-	return "users"
+func (book *Books) Table() string {
+	return "books"
 }
 
-func (user *User) String() string {
-	return Stringify(user)
+func (book *Books) String() string {
+	return Stringify(book)
 }
-

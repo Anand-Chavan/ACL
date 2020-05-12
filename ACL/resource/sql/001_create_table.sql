@@ -1,84 +1,44 @@
-use acl;
+USE restapi;
 
+CREATE TABLE IF NOT EXISTS user_detail (
+    id                  INT         AUTO_INCREMENT      PRIMARY KEY,
+    first_name          CHAR(25)    NOT NULL,
+    last_name           CHAR(25)    NOT NULL,
+    email               CHAR(64)    NOT NULL UNIQUE,
+    password            VARBINARY(128)    NOT NULL,
+    contact_number      CHAR(15)    NOT NULL,
+    updated_by          INT         NOT NULL DEFAULT 0,
+    deleted             TINYINT(1)  NOT NULL DEFAULT 0,
+    creation_date       DATETIME    DEFAULT CURRENT_TIMESTAMP,
+    last_update         DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+)ENGINE = INNODB CHARACTER SET=utf8;
 
-CREATE TABLE  users
-(
-    Name VARCHAR(30) NOT NULL,
-    Id  INT NOT NULL AUTO_INCREMENT,
-    Password  VARCHAR(20) NOT NULL,
-    DateCreation VARCHAR(30) NOT NULL,
-    UserType VARCHAR(30) NOT NULL,
-    PRIMARY KEY (Id)
-);
+DROP TABLE IF EXISTS books;
+CREATE TABLE IF NOT EXISTS books (
+    id   INT(11) AUTO_INCREMENT,
+    title   VARCHAR(100)  NOT NULL,
+    content       LONGTEXT  NOT NULL,
+    PRIMARY KEY(id)
+ );
 
-CREATE TABLE  sessionInfo
-(
-    Id  INT NOT NULL AUTO_INCREMENT,
-    sessionId VARCHAR(20) NOT NULL,
-    logintime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-    PRIMARY KEY (Id,sessionId)
-);
-
-CREATE TABLE  groups
-(
-    groupId  INT NOT NULL AUTO_INCREMENT,
-    groupName  VARCHAR(30) NOT NULL,
-    groupCreationDate  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-    groupDescription VARCHAR(20),
-    PRIMARY KEY (groupId)
-);
-
-CREATE TABLE  whoGroupCreated
-(
-    Id  INT NOT NULL AUTO_INCREMENT,
-    groupId INT,
-    FOREIGN KEY (Id) REFERENCES users(Id),
-    FOREIGN KEY (groupId) REFERENCES groups(groupId),
-    PRIMARY KEY(groupId,Id)
-);
-
-CREATE TABLE  userGroupMap
-(
-    groupId  INT,
-    Id  INT NOT NULL AUTO_INCREMENT,
-    FOREIGN KEY (groupId) REFERENCES groups(groupId),
-    FOREIGN KEY (Id) REFERENCES users(Id),
-    PRIMARY KEY(groupId,Id)
-);
-
-
-
-
-
-CREATE TABLE  content(
-    contentId int,
-    contentName varchar(20),
-    contentInfo varchar(2),
-    PRIMARY KEY (contentId)
-);
-
-CREATE TABLE permission(
-permissionValue varchar(20),
-PRIMARY KEY(permissionValue)
-);
-
-
-CREATE TABLE  userPermission(
-    Id  INT NOT NULL AUTO_INCREMENT,
-    contentId int,
-    permissionValue varchar(20),
-    FOREIGN KEY (Id) REFERENCES users(Id),
-    FOREIGN KEY (contentId) REFERENCES content(contentId),
-    FOREIGN KEY (permissionValue) REFERENCES permission(permissionValue),
-    PRIMARY KEY(Id,contentId,permissionValue)
-);
-
-CREATE TABLE  groupPermission(
-    groupId  INT,
-    contentId int,
-    permissionValue varchar(20),
-    FOREIGN KEY (groupId) REFERENCES groups(groupId),
-    FOREIGN KEY (contentId) REFERENCES content(contentId),
-    FOREIGN KEY (permissionValue) REFERENCES permission(permissionValue),
-    PRIMARY KEY(groupId,contentId,permissionValue)
-);
+DROP TABLE IF EXISTS users;
+CREATE TABLE IF NOT EXISTS users (
+    -- id   INT(11) AUTO_INCREMENT,
+    uName VARCHAR(30) NOT NULL,
+    userId  VARCHAR(30) NOT NULL,
+    password  VARCHAR(20) NOT NULL,
+    dateCreation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+    userType VARCHAR(30) NOT NULL,
+    PRIMARY KEY (userId)
+ );
+ INSERT INTO users (uName,userId,password,userType) VALUES ('sagar','sagar','".md5('123')."','s');
+ INSERT INTO users (uName,userId,password,userType) VALUES ('chopade','chopade','".md5('123')."','s');
+DROP TABLE IF EXISTS usersKey;
+CREATE TABLE IF NOT EXISTS usersKey (
+    userId  VARCHAR(30) NOT NULL,
+    sessionKey VARCHAR(100) NOT NULL,
+    logDate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+    FOREIGN KEY (userId) REFERENCES users(userId),
+    PRIMARY KEY (userId,sessionKey)
+ );
+    INSERT INTO usersKey (userId,sessionKey) VALUES ('sagar',replace(uuid(),'-',''));

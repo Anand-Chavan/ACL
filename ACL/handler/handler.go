@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	// "fmt"
 )
 
 type IHTTPHandler interface {
@@ -13,6 +12,8 @@ type IHTTPHandler interface {
 	Update(http.ResponseWriter, *http.Request)
 	Delete(http.ResponseWriter, *http.Request)
 	GetAll(http.ResponseWriter, *http.Request)
+	SetAll(http.ResponseWriter, *http.Request)
+	GetByuserId(http.ResponseWriter, *http.Request)
 }
 
 type HTTPHandler struct {
@@ -29,32 +30,33 @@ type response struct {
 }
 
 func (hdlr *HTTPHandler) GetHTTPHandler() []HTTPHandler {
-	//fmt.Println("handler->hnadler.go->GetHTTPHandler")
 	return []HTTPHandler{}
 }
 
 func (hdlr *HTTPHandler) GetByID(w http.ResponseWriter, r *http.Request) {
-	//fmt.Println("handler->hnadler.go->GetByID")
 	return
 }
 
 func (hdlr *HTTPHandler) Create(w http.ResponseWriter, r *http.Request) {
-	//fmt.Println("handler->hnadler.go->Create")
 	return
 }
 
 func (hdlr *HTTPHandler) Update(w http.ResponseWriter, r *http.Request) {
-	//fmt.Println("handler->hnadler.go->Update")
 	return
 }
 
 func (hdlr *HTTPHandler) Delete(w http.ResponseWriter, r *http.Request) {
-	//fmt.Println("handler->hnadler.go->Delete")
 	return
 }
 
 func (hdlr *HTTPHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	//fmt.Println("handler->hnadler.go->GetAll")
+	return
+}
+func (hdlr *HTTPHandler) SetAll(w http.ResponseWriter, r *http.Request) {
+	return
+}
+
+func (hdlr *HTTPHandler) GetByuserId(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
@@ -74,9 +76,10 @@ func WriteJSONResponse(w http.ResponseWriter,
 
 	response, _ := json.Marshal(resp)
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	// w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	w.WriteHeader(code)
+	//fmt.Println(code)
 	w.Write(response)
-
-	//fmt.Println("handler->hnadler.go->WriteJSONResponse")
 	return
 }

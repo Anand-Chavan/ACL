@@ -38,8 +38,8 @@ func (api *RestApiConfig) String() string {
 }
 
 func init() {
-	pwd,_:=os.Getwd()
-	file, err := ioutil.ReadFile(pwd+configFile)
+	pwd, _ := os.Getwd()
+	file, err := ioutil.ReadFile(pwd + configFile)
 	if nil != err {
 		log.Printf("Error while reading config file: %s:%s", configFile, err.Error())
 		os.Exit(1)
@@ -51,16 +51,13 @@ func init() {
 		log.Printf("Error while reading configuration: %s:%s", configFile, err.Error())
 		os.Exit(1)
 	}
-	//fmt.Println("config  ->  init")
 }
 
 func Config() *RestApiConfig {
-	//fmt.Println("config  ->  Config")
 	return _config
 }
 
 func (cfg *MysqlConnection) ConnString() string {
-	//fmt.Println("config  ->  ConnString")
 	return fmt.Sprintf(
 		"%s:%s@tcp(%s:%d)/%s", cfg.Username, cfg.Password,
 		cfg.Host, cfg.Port, cfg.Database)

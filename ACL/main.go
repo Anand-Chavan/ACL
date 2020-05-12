@@ -5,14 +5,15 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 
-	"github.com/pucsd2020-pp/ACL/config"
-	"github.com/pucsd2020-pp/ACL/driver"
-	"github.com/pucsd2020-pp/ACL/handler"
-	httpHandler "github.com/pucsd2020-pp/ACL/handler/http"
+	"github.com/pucsd2020-pp/rest-api/config"
+	"github.com/pucsd2020-pp/rest-api/driver"
+	"github.com/pucsd2020-pp/rest-api/handler"
+	httpHandler "github.com/pucsd2020-pp/rest-api/handler/http"
 )
 
 var (
@@ -31,17 +32,28 @@ func init() {
 	}
 
 	handlers = []handler.IHTTPHandler{
-		httpHandler.NewUserHandler(dbConn),
+		// httpHandler.NewUserHandler(dbConn),
+		// httpHandler.NewBooksHandler(dbConn),
+		httpHandler.NewAclHandler(dbConn),
 	}
-	// fmt.Println("init")
+}
+
+type timeHandler struct {
+	format string
+}
+
+func (th *timeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+
+	w.Write([]byte("The time is: "))
 }
 
 func createRouterGroup(router *chi.Mux) {
+	th := &timeHandler{format: time.RFC1123}
 	router.Group(func(r chi.Router) {
+		r.Handle("/time", th)
 		for _, hdlr := range handlers { // register all handlers
 			for _, hlr := range hdlr.GetHTTPHandler() {
 				path := fmt.Sprintf("/webapi/v1/%s", hlr.Path)
-				fmt.Println(path)
 				switch hlr.Method {
 				case http.MethodGet:
 					r.Get(path, hlr.Func)
@@ -57,7 +69,6 @@ func createRouterGroup(router *chi.Mux) {
 			}
 		}
 	})
-	// fmt.Println("createRouterGroup")
 }
 
 func main() {
@@ -68,6 +79,4 @@ func main() {
 
 	http.ListenAndServe(fmt.Sprintf("%s:%d",
 		config.Config().Host, config.Config().Port), router)
-
-	// fmt.Println("main")
 }
