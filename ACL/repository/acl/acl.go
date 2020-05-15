@@ -20,7 +20,10 @@ func (acl *aclRepository) GetByID(cntx context.Context, id string) (interface{},
 	obj := new(model.Acl)
 	return driver.GetById(acl.conn, obj, id)
 }
-
+func (acl *aclRepository) GetGroupById(cntx context.Context, id string) (interface{}, error) {
+	obj := new(model.UserAddToGroup)
+	return driver.GetGroupById(acl.conn, obj, id)
+}
 func (acl *aclRepository) GetByuserId(cntx context.Context, id string) (interface{}, error) {
 
 	obj := new(model.Acl)

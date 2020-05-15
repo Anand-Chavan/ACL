@@ -34,5 +34,7 @@ OUT:{"status":200,"data":{"filefolderPath":"/","filefolderName":"test12","filesO
 //delete files and folder according to permissions
 curl -X POST -d '{"filefolderPath":"/","filefolderName":"test","filesOrFolderId":"f" ,"userId":"u1","sessionKey":"abcd"}' http://localhost:9090/webapi/v1/deletefilefolder
 
-
+//Read All groups  that user have join
+curl -X GET  http://localhost:9090/webapi/v1/getgroupname/u1
+OUT: {"status":200,"data":[["abc6","u1"],["g1","u1"],["g3","u1"]]}
 

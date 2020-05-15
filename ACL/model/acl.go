@@ -116,3 +116,9 @@ type SelFileFold struct {
 	FilefolderName string `json:"filefolderName" column:"filefolderName"`
 	UserType       string `json:"userType" column:"userType"`
 }
+
+// type ReadFile struct {
+// 	FilefolderPath string `json:"filefolderPath" column:"filefolderPath"`
+// 	FilefolderName string `json:"filefolderName" column:"filefolderName"`
+// 	UserId         string `json:"userId" column:"userId"`
+// }

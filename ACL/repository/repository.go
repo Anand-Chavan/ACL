@@ -6,6 +6,7 @@ import (
 
 type IRepository interface {
 	GetByID(context.Context, string) (interface{}, error)
+	GetGroupById(context.Context, string) (interface{}, error)
 	Create(context.Context, interface{}) (interface{}, error)
 	CreateFileFolder(context.Context, interface{}) (interface{}, error)
 	DeleteFileFolder(context.Context, interface{}) (interface{}, error)
@@ -27,7 +28,9 @@ type Repository struct {
 func (repo *Repository) GetByID(cntx context.Context, id int64) (obj interface{}, err error) {
 	return
 }
-
+func (repo *Repository) GetGroupById(cntx context.Context, id int64) (obj interface{}, err error) {
+	return
+}
 func (repo *Repository) Create(cntx context.Context, obj interface{}) (cobj interface{}, err error) {
 	return
 }

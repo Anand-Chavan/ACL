@@ -401,6 +401,70 @@ func UpdateById(conn *sql.DB, object model.IModel) error {
 
 	return err
 }
+func GetGroupById(conn *sql.DB, object model.IModel, id string) ([]interface{}, error) {
+	rValue := reflect.ValueOf(object)
+	rType := reflect.TypeOf(object)
+
+	columns := []string{}
+	//pointers := make([]interface{}, 0)
+
+	for idx := 0; idx < rValue.Elem().NumField(); idx++ {
+		field := rType.Elem().Field(idx)
+		if COLUMN_INGNORE_FLAG == field.Tag.Get("ignore") {
+			continue
+		}
+		column := field.Tag.Get("column")
+		if column != "sessionKey" {
+			columns = append(columns, column)
+		}
+		//pointers = append(pointers, rValue.Elem().Field(idx).Addr().Interface())
+	}
+
+	var queryBuffer bytes.Buffer
+	// var params []interface{}
+
+	queryBuffer.WriteString("SELECT ")
+	queryBuffer.WriteString(strings.Join(columns, ", "))
+	queryBuffer.WriteString(" FROM ")
+	queryBuffer.WriteString(object.Table())
+	queryBuffer.WriteString(" WHERE userId= '" + id + "';")
+
+	query := queryBuffer.String()
+	row, err := conn.Query(query)
+	if nil != err {
+		log.Printf("Error conn.Query: %s\n\tError Query: %s\n", err.Error(), query)
+		return nil, err
+	}
+	objects := make([]interface{}, 0)
+	recds, err := row.Columns()
+	if nil != err {
+		log.Printf("Error conn.Query: %s\n\tError Query: %s\n", err.Error(), query)
+		return nil, err
+	}
+	defer row.Close()
+	for row.Next() {
+		if nil != err {
+			log.Printf("Error row.Columns(): %s\n\tError Query: %s\n", err.Error(), query)
+			return nil, err
+		}
+		values := make([]interface{}, len(recds))
+		recdsWrite := make([]string, len(recds))
+		for index, _ := range recds {
+			values[index] = &recdsWrite[index]
+		}
+		err = row.Scan(values...)
+		if nil != err {
+			log.Printf("Error: row.Scan: %s\n", err.Error())
+			return nil, err
+		}
+
+		objects = append(objects, values)
+
+	}
+
+	return objects, nil
+
+}
 
 func GetById(conn *sql.DB, object model.IModel, id string) (model.IModel, error) {
 	rValue := reflect.ValueOf(object)
@@ -416,8 +480,10 @@ func GetById(conn *sql.DB, object model.IModel, id string) (model.IModel, error)
 		}
 
 		column := field.Tag.Get("column")
-		columns = append(columns, column)
-		pointers = append(pointers, rValue.Elem().Field(idx).Addr().Interface())
+		if column != "sessionKey" {
+			columns = append(columns, column)
+			pointers = append(pointers, rValue.Elem().Field(idx).Addr().Interface())
+		}
 	}
 
 	var queryBuffer bytes.Buffer
