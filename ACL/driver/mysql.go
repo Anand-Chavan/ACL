@@ -773,67 +773,157 @@ func Authentication(conn *sql.DB, object model.IModel) (interface{}, error) {
 	}
 	return tag, nil
 }
-func GetFilesFold(conn *sql.DB, object model.IModel) (interface{}, error) {
+func GetFilesFold(conn *sql.DB, object model.IModel, limit, offset int64) ([]interface{}, error) {
 	rValue := reflect.ValueOf(object)
 	rType := reflect.TypeOf(object)
 
-	// columns := []string{}
-	// pointers := make([]interface{}, 0)
+	columns := []string{}
 	var filefolderPath, userId string
+
 	for idx := 0; idx < rValue.Elem().NumField(); idx++ {
 		field := rType.Elem().Field(idx)
 		value := rValue.Elem().Field(idx)
+
 		if COLUMN_INGNORE_FLAG == field.Tag.Get("ignore") {
 			continue
 		}
 
 		column := field.Tag.Get("column")
-		// columns = append(columns, column)
-		if column == "filefolderPath" {
-			filefolderPath = value.String()
-		}
 		if column == "userId" {
 			userId = value.String()
 		}
-		// pointers = append(pointers, rValue.Elem().Field(idx).Addr().Interface())
-		// fmt.Println(column, value.String())
+		if column != "sessionKey" && column != "userId" {
+
+			if column == "filefolderPath" {
+				filefolderPath = value.String()
+			}
+
+			columns = append(columns, column)
+			//pointers = append(pointers, rValue.Elem().Field(idx).Addr().Interface())
+		}
 	}
-	fmt.Println(filefolderPath, userId)
-	objects := make([]interface{}, 0)
+
+	var queryBuffer bytes.Buffer
+	// var params []interface{}
 
 	obj1 := new(model.SelFileFold)
 	_ = conn.QueryRow("select userType from users where userId='" + userId + "';").Scan(&obj1.UserType)
+	// fmt.Println("select userType from users where userId='" + userId + "';")
+	// fmt.Println(obj1.UserType)
 	if obj1.UserType == "s" {
-		rows, err := conn.Query("select * from filesfolder where filefolderPath='" + filefolderPath + "';")
-		if err != nil {
-			log.Fatal("Query failed:", err.Error())
-		}
-		defer rows.Close()
 
-		columns, _ := rows.Columns()
-		// fmt.Println(columns)
-		// count := len(columns)
-		// recds, err := row.Columns()
-		// var v struct {
-		// 	Data []interface{}
-		// }
-		for rows.Next() {
-			values := make([]interface{}, len(columns))
-			valuePtrs := make([]interface{}, len(columns))
-			for i, _ := range columns {
-				valuePtrs[i] = &values[i]
-				// fmt.Println(valuePtrs[i], &values[i])
+		queryBuffer.WriteString("select * from filesfolder where filefolderPath='" + filefolderPath + "';")
+		query := queryBuffer.String()
+		// fmt.Println(query)
+
+		row, err := conn.Query(query)
+		if nil != err {
+			log.Printf("Error conn.Query: %s\n\tError Query: %s\n", err.Error(), query)
+			return nil, err
+		}
+		objects := make([]interface{}, 0)
+		recds, err := row.Columns()
+		if nil != err {
+			log.Printf("Error conn.Query: %s\n\tError Query: %s\n", err.Error(), query)
+			return nil, err
+		}
+		defer row.Close()
+		for row.Next() {
+			if nil != err {
+				log.Printf("Error row.Columns(): %s\n\tError Query: %s\n", err.Error(), query)
+				return nil, err
 			}
-			if err := rows.Scan(valuePtrs...); err != nil {
-				log.Fatal(err)
+			values := make([]interface{}, len(recds))
+			recdsWrite := make([]string, len(recds))
+			for index, _ := range recds {
+				values[index] = &recdsWrite[index]
+			}
+			err = row.Scan(values...)
+			if nil != err {
+				log.Printf("Error: row.Scan: %s\n", err.Error())
+				return nil, err
+			}
+
+			objects = append(objects, values)
+
+		}
+
+		return objects, nil
+
+	} else {
+
+		queryBuffer.WriteString("select * from groupPermission where filefolderPath='" + filefolderPath + "' AND groupName IN (select groupName from userGroupMap where userId='" + userId + "') ;")
+		query := queryBuffer.String()
+		// fmt.Println(query)
+		row, err := conn.Query(query)
+		if nil != err {
+			log.Printf("Error conn.Query: %s\n\tError Query: %s\n", err.Error(), query)
+			return nil, err
+		}
+		objects := make([]interface{}, 0)
+		recds, err := row.Columns()
+		if nil != err {
+			log.Printf("Error conn.Query: %s\n\tError Query: %s\n", err.Error(), query)
+			return nil, err
+		}
+		defer row.Close()
+		for row.Next() {
+			if nil != err {
+				log.Printf("Error row.Columns(): %s\n\tError Query: %s\n", err.Error(), query)
+				return nil, err
+			}
+			values := make([]interface{}, len(recds))
+			recdsWrite := make([]string, len(recds))
+			for index, _ := range recds {
+				values[index] = &recdsWrite[index]
+			}
+			err = row.Scan(values...)
+			if nil != err {
+				log.Printf("Error: row.Scan: %s\n", err.Error())
+				return nil, err
 			}
 			objects = append(objects, values)
+
 		}
-		// jsonMsg, err := json.Marshal(v)
+		var queryBuffer1 bytes.Buffer
+		queryBuffer1.WriteString("select * from userPermission where filefolderPath='" + filefolderPath + "' AND userId='" + userId + "';")
+		query1 := queryBuffer1.String()
+		// fmt.Println(query)
+		row1, err := conn.Query(query1)
+		if nil != err {
+			log.Printf("Error conn.Query: %s\n\tError Query: %s\n", err.Error(), query1)
+			return nil, err
+		}
+		// objects1 := make([]interface{}, 0)
+		recds1, err := row1.Columns()
+		if nil != err {
+			log.Printf("Error conn.Query: %s\n\tError Query: %s\n", err.Error(), query1)
+			return nil, err
+		}
+		defer row1.Close()
+		for row1.Next() {
+			if nil != err {
+				log.Printf("Error row.Columns(): %s\n\tError Query: %s\n", err.Error(), query1)
+				return nil, err
+			}
+			values1 := make([]interface{}, len(recds))
+			recdsWrite1 := make([]string, len(recds))
+			for index, _ := range recds1 {
+				values1[index] = &recdsWrite1[index]
+			}
+			err = row1.Scan(values1...)
+			if nil != err {
+				log.Printf("Error: row.Scan: %s\n", err.Error())
+				return nil, err
+			}
+
+			objects = append(objects, values1)
+		}
+
 		return objects, nil
 
 	}
-	return nil, nil
+
 }
 
 func Logout(conn *sql.DB, object model.IModel) (sql.Result, error) {
@@ -876,11 +966,19 @@ func CreateGroup(conn *sql.DB, object model.IModel) (sql.Result, error) {
 	columns1 := []string{}
 	var params1 []interface{}
 	count := 0
+	var groupName, userId string
+
 	for idx := 0; idx < rValue.Elem().NumField(); idx++ {
 		field := rType.Elem().Field(idx)
 		value := rValue.Elem().Field(idx)
 
 		column := field.Tag.Get("column")
+		if column == "userId" {
+			userId = value.String()
+		}
+		if column == "groupName" {
+			groupName = value.String()
+		}
 		if column != "userId" && column != "sessionKey" {
 			fmt.Println(column)
 
@@ -940,12 +1038,40 @@ func CreateGroup(conn *sql.DB, object model.IModel) (sql.Result, error) {
 
 	defer stmt1.Close()
 	// result1, err := stmt1.Exec(params1...)
-	result1, err := stmt1.Exec(params1...)
-	fmt.Println(result1)
+	_, err = stmt1.Exec(params1...)
+	// fmt.Println(result1)
 	if nil != err {
 		log.Printf("Insert Execute Error: %s\nError Query: %s : %s\n",
 			err.Error(), object.String(), query1)
 		return nil, err
 	}
+	var queryBuffer2 bytes.Buffer
+	queryBuffer2.WriteString("INSERT INTO ")
+	queryBuffer2.WriteString("userGroupMap ")
+	queryBuffer2.WriteString("( groupName,userId")
+	// queryBuffer2.WriteString(strings.Join(columns1, ", "))
+	queryBuffer2.WriteString(") VALUES('" + groupName + "','" + userId + "');")
+	// queryBuffer2.WriteString()
+	// queryBuffer2.WriteString()
+
+	query2 := queryBuffer2.String()
+	stmt2, err := conn.Prepare(query2)
+	if nil != err {
+
+		log.Printf("Insert Syntax Error: %s\n\tError Query: %s : %s\n",
+			err.Error(), object.String(), query2)
+		return nil, err
+	}
+
+	defer stmt1.Close()
+	// result1, err := stmt1.Exec(params1...)
+	_, err = stmt2.Exec()
+	// fmt.Println(result2)
+	if nil != err {
+		log.Printf("Insert Execute Error: %s\nError Query: %s : %s\n",
+			err.Error(), object.String(), query2)
+		return nil, err
+	}
+
 	return result, nil
 }

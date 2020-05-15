@@ -1,0 +1,38 @@
+//for Login
+curl -X POST -d '{"userId":"abc","password":"123"}' http://localhost:9090/webapi/v1/auth
+Out:{"status":200,"data":{"userId":"abc","sessionKey":"f71c9f90969411eaa5b0525400d045b7"}}
+
+//for LogOut
+curl -X POST -d '{"userId":"abc","sessionKey":"f71c9f90969411eaa5b0525400d045b7"}' http://localhost:9090/webapi/v1/logout
+OUT: {"status":200,"data":{"Locker":{}}}
+
+
+//create user
+curl -X POST -d '{"uName":"abc","userId":"abc","password":"123","userType":"s","sessionKey":"abcd"}' http://localhost:9090/webapi/v1/acl
+{"status":200,"data":{"uName":"abcd","userId":"abcd","password":"123","userType":"s"}}
+
+//create Group
+curl -X POST -d '{"userId":"sagar","groupName":"abc6" ,"groupDescription":"abc temp group" ,"sessionKey":"abcd"}' http://localhost:9090/webapi/v1/creategroup
+Out: {"status":200,"data":{"groupName":"abc6","userId":"sagar","sessionKey":"abcd","groupDescription":"abc temp group"}}
+
+//Addd user into group
+curl -X POST -d '{"userId":"u1","groupName":"abc6","sessionKey":"abcd"}' http://localhost:9090/webapi/v1/adduserintogroup
+OUT:{"status":200,"data":{"groupName":"abc6","userId":"u1","sessionKey":"abcd"}}
+
+//Get File or directory  with respect to there permission 
+curl -X POST -d '{"filefolderPath":"/" ,"userId":"u2"}' http://localhost:9090/webapi/v1/getfilefolder
+OUT:{"status":200,"data":[["/","unifile.txt","f","g2","r"],["/","test10.txt","f","u2","w"],["/","test7.txt","f","u2","w"],["/","test9.txt","f","u2","w"],["/","unifile.txt","f","u2","w"]]}
+
+//Create folder and files according to permission
+curl -X POST -d '{"filefolderPath":"/","filefolderName":"test10","filesOrFolderId":"d" ,"userId":"sagar","sessionKey":"abcd"}' http://localhost:9090/webapi/v1/createfilefolder
+OUT:{"status":200,"data":{"filefolderPath":"/","filefolderName":"test10","filesOrFolderId":"d","sessionKey":"abcd","userId":"sagar"}}
+//when user dont have permission of write
+curl -X POST -d '{"filefolderPath":"/","filefolderName":"test12","filesOrFolderId":"d" ,"userId":"u5","sessionKey":"abcd"}' http://localhost:9090/webapi/v1/createfilefolder
+OUT:{"status":200,"data":{"filefolderPath":"/","filefolderName":"test12","filesOrFolderId":"d","sessionKey":"abcd","userId":"u5"},"message":"You dont have permission of write"}
+
+
+//delete files and folder according to permissions
+curl -X POST -d '{"filefolderPath":"/","filefolderName":"test","filesOrFolderId":"f" ,"userId":"u1","sessionKey":"abcd"}' http://localhost:9090/webapi/v1/deletefilefolder
+
+
+

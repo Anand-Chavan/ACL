@@ -99,6 +99,7 @@ type ScanData struct {
 type GetFilesFold struct {
 	FilefolderPath string `json:"filefolderPath" column:"filefolderPath"`
 	SessionKey     string `json:"sessionKey" column:"sessionKey"`
+	FilefolderName string `json:"filefolderName" column:"filefolderName"`
 	UserId         string `json:"userId" column:"userId"`
 }
 

@@ -86,8 +86,10 @@ func (acl *aclRepository) Authentication(cntx context.Context, obj interface{}) 
 	return usr1, nil
 }
 func (acl *aclRepository) GetFilesFolder(cntx context.Context, obj interface{}) (interface{}, error) {
+	// obj := &model.GetFilesFold{}
+	// return driver.GetFilesFold(acl.conn, obj, 0, 0)
 	auth := obj.(model.GetFilesFold)
-	usr1, err := driver.GetFilesFold(acl.conn, &auth)
+	usr1, err := driver.GetFilesFold(acl.conn, &auth, 0, 0)
 	if nil != err {
 		return 0, err
 	}
