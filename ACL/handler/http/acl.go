@@ -30,11 +30,15 @@ func (acl *Acl) GetHTTPHandler() []*handler.HTTPHandler {
 		&handler.HTTPHandler{Authenticated: true, Method: http.MethodPost, Path: "acl", Func: acl.Create},
 		&handler.HTTPHandler{Authenticated: true, Method: http.MethodPost, Path: "auth", Func: acl.Authentication},
 		&handler.HTTPHandler{Authenticated: true, Method: http.MethodPost, Path: "logout", Func: acl.Logout},
+		&handler.HTTPHandler{Authenticated: true, Method: http.MethodPost, Path: "creategroup", Func: acl.CreateGroup},
+		&handler.HTTPHandler{Authenticated: true, Method: http.MethodPost, Path: "adduserintogroup", Func: acl.AddUserIntoGroup},
+		&handler.HTTPHandler{Authenticated: true, Method: http.MethodPost, Path: "createfilefolder", Func: acl.CreateFileFolder},
+		&handler.HTTPHandler{Authenticated: true, Method: http.MethodPost, Path: "deletefilefolder", Func: acl.DeleteFileFolder},
+		&handler.HTTPHandler{Authenticated: true, Method: http.MethodPost, Path: "getfilefolder", Func: acl.GetFilesFolder},
 		&handler.HTTPHandler{Authenticated: true, Method: http.MethodPut, Path: "acl/{userId}", Func: acl.Update},
 		&handler.HTTPHandler{Authenticated: true, Method: http.MethodDelete, Path: "acl/{userId}", Func: acl.Delete},
 		&handler.HTTPHandler{Authenticated: true, Method: http.MethodGet, Path: "acl", Func: acl.GetAll},
 		&handler.HTTPHandler{Authenticated: true, Method: http.MethodGet, Path: "acl1", Func: acl.SetAll},
-		///write path =books/{id}
 	}
 }
 
@@ -84,6 +88,21 @@ func (acl *Acl) Authentication(w http.ResponseWriter, r *http.Request) {
 	}
 	handler.WriteJSONResponse(w, r, auth, http.StatusOK, err)
 }
+
+func (acl *Acl) GetFilesFolder(w http.ResponseWriter, r *http.Request) {
+	var usr model.GetFilesFold
+	var auth interface{}
+	err := json.NewDecoder(r.Body).Decode(&usr)
+	for {
+		if nil != err {
+			break
+		}
+
+		auth, err = acl.repo.GetFilesFolder(r.Context(), usr)
+		break
+	}
+	handler.WriteJSONResponse(w, r, auth, http.StatusOK, err)
+}
 func (acl *Acl) Logout(w http.ResponseWriter, r *http.Request) {
 	var usr model.Key
 	var auth interface{}
@@ -98,7 +117,32 @@ func (acl *Acl) Logout(w http.ResponseWriter, r *http.Request) {
 	}
 	handler.WriteJSONResponse(w, r, auth, http.StatusOK, err)
 }
+func (acl *Acl) DeleteFileFolder(w http.ResponseWriter, r *http.Request) {
+	var ff model.CreateFileOrFolder
+	err := json.NewDecoder(r.Body).Decode(&ff)
+	for {
+		if nil != err {
+			break
+		}
 
+		_, err = acl.repo.DeleteFileFolder(r.Context(), ff)
+		break
+	}
+	handler.WriteJSONResponse(w, r, ff, http.StatusOK, err)
+}
+func (acl *Acl) CreateFileFolder(w http.ResponseWriter, r *http.Request) {
+	var ff model.CreateFileOrFolder
+	err := json.NewDecoder(r.Body).Decode(&ff)
+	for {
+		if nil != err {
+			break
+		}
+
+		_, err = acl.repo.CreateFileFolder(r.Context(), ff)
+		break
+	}
+	handler.WriteJSONResponse(w, r, ff, http.StatusOK, err)
+}
 func (acl *Acl) Create(w http.ResponseWriter, r *http.Request) {
 	var usr model.Acl
 	err := json.NewDecoder(r.Body).Decode(&usr)
@@ -111,6 +155,32 @@ func (acl *Acl) Create(w http.ResponseWriter, r *http.Request) {
 		break
 	}
 	handler.WriteJSONResponse(w, r, usr, http.StatusOK, err)
+}
+func (acl *Acl) AddUserIntoGroup(w http.ResponseWriter, r *http.Request) {
+	var usr model.UserAddToGroup
+	err := json.NewDecoder(r.Body).Decode(&usr)
+	for {
+		if nil != err {
+			break
+		}
+
+		_, err = acl.repo.AddUserIntoGroup(r.Context(), usr)
+		break
+	}
+	handler.WriteJSONResponse(w, r, usr, http.StatusOK, err)
+}
+func (acl *Acl) CreateGroup(w http.ResponseWriter, r *http.Request) {
+	var grp model.Groups
+	err := json.NewDecoder(r.Body).Decode(&grp)
+	for {
+		if nil != err {
+			break
+		}
+
+		_, err = acl.repo.CreateGroup(r.Context(), grp)
+		break
+	}
+	handler.WriteJSONResponse(w, r, grp, http.StatusOK, err)
 }
 
 func (acl *Acl) Update(w http.ResponseWriter, r *http.Request) {

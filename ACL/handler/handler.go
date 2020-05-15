@@ -9,6 +9,8 @@ type IHTTPHandler interface {
 	GetHTTPHandler() []*HTTPHandler
 	GetByID(http.ResponseWriter, *http.Request)
 	Create(http.ResponseWriter, *http.Request)
+	CreateFileFolder(http.ResponseWriter, *http.Request)
+	AddUserIntoGroup(http.ResponseWriter, *http.Request)
 	Update(http.ResponseWriter, *http.Request)
 	Delete(http.ResponseWriter, *http.Request)
 	GetAll(http.ResponseWriter, *http.Request)
@@ -40,7 +42,12 @@ func (hdlr *HTTPHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 func (hdlr *HTTPHandler) Create(w http.ResponseWriter, r *http.Request) {
 	return
 }
-
+func (hdlr *HTTPHandler) CreateFileFolder(w http.ResponseWriter, r *http.Request) {
+	return
+}
+func (hdlr *HTTPHandler) DeleteFileFolder(w http.ResponseWriter, r *http.Request) {
+	return
+}
 func (hdlr *HTTPHandler) Update(w http.ResponseWriter, r *http.Request) {
 	return
 }
@@ -57,6 +64,10 @@ func (hdlr *HTTPHandler) SetAll(w http.ResponseWriter, r *http.Request) {
 }
 
 func (hdlr *HTTPHandler) GetByuserId(w http.ResponseWriter, r *http.Request) {
+	return
+}
+
+func (hdlr *HTTPHandler) AddUserIntoGroup(w http.ResponseWriter, r *http.Request) {
 	return
 }
 

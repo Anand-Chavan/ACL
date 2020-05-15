@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os"
 	"reflect"
 	"strings"
 	"time"
@@ -76,10 +77,12 @@ func Create(conn *sql.DB, object model.IModel) (sql.Result, error) {
 		// }
 
 		column := field.Tag.Get("column")
-		columns = append(columns, column)
-		params = append(params, value.Interface())
-		log.Printf("string of parameters:- ", value.Interface())
-		count++
+		// fmt.Println(column)
+		if column != "sessionKey" {
+			columns = append(columns, column)
+			params = append(params, value.Interface())
+			count++
+		}
 	}
 
 	var queryBuffer bytes.Buffer
@@ -111,6 +114,229 @@ func Create(conn *sql.DB, object model.IModel) (sql.Result, error) {
 	return result, nil
 }
 
+func CreateFileFolder(conn *sql.DB, object model.IModel) (sql.Result, error) {
+	rValue := reflect.ValueOf(object)
+	rType := reflect.TypeOf(object)
+
+	columns := []string{}
+	var params []interface{}
+	columns1 := []string{}
+	var params1 []interface{}
+	count := 0
+	cnt := 0
+	var userid, filefolderPath string
+	for idx := 0; idx < rValue.Elem().NumField(); idx++ {
+		field := rType.Elem().Field(idx)
+		value := rValue.Elem().Field(idx)
+		column := field.Tag.Get("column")
+		// fmt.Println(column)
+		if column != "sessionKey" && column != "userId" {
+			columns = append(columns, column)
+			params = append(params, value.Interface())
+			if column == "filefolderPath" {
+				filefolderPath = value.String()
+			}
+			columns1 = append(columns1, column)
+			params1 = append(params1, value.Interface())
+			count++
+			cnt++
+		}
+		if column == "userId" {
+			columns1 = append(columns1, column)
+			params1 = append(params1, value.Interface())
+			cnt++
+			userid = value.String()
+		}
+		// fmt.Println(params, columns)
+	}
+	// var writepermission int
+	obj1 := new(model.ScanData)
+	_ = conn.QueryRow("select count(*) as count from userPermission where userId='" + userid + "'and filefolderPath= '" + filefolderPath + "' and permissionValue='w';").Scan(&obj1.WritePermissionusr)
+	// fmt.Println("write permission :", obj1.WritePermissionusr, userid, filefolderPath)
+	_ = conn.QueryRow("select count(*) as count from (select permissionValue from groupPermission where groupName IN (select groupName from userGroupMap where userId='" + userid + "') AND filefolderPath='" + filefolderPath + "' AND permissionValue='w') AS writePermission;").Scan(&obj1.WritePermissiongrp)
+	// fmt.Println("write permission :", obj1.WritePermissiongrp, userid, filefolderPath)
+	if obj1.WritePermissionusr > 0 || obj1.WritePermissiongrp > 0 {
+		var queryBuffer bytes.Buffer
+		queryBuffer.WriteString("INSERT INTO ")
+		queryBuffer.WriteString(object.Table())
+		queryBuffer.WriteString("(")
+		queryBuffer.WriteString(strings.Join(columns, ", "))
+		queryBuffer.WriteString(") VALUES(")
+		queryBuffer.WriteString(GetPlaceHolder(count))
+		queryBuffer.WriteString(");")
+
+		query := queryBuffer.String()
+		stmt, err := conn.Prepare(query)
+		if nil != err {
+			log.Printf("Insert Syntax Error: %s\n\tError Query: %s : %s\n",
+				err.Error(), object.String(), query)
+			return nil, err
+		}
+
+		defer stmt.Close()
+
+		result, err := stmt.Exec(params...)
+		if nil != err {
+			log.Printf("Insert Execute Error: %s\nError Query: %s : %s\n",
+				err.Error(), object.String(), query)
+			return nil, err
+		}
+		var queryBuffer1 bytes.Buffer
+		queryBuffer1.WriteString("INSERT INTO ")
+		queryBuffer1.WriteString("userPermission")
+		queryBuffer1.WriteString("(")
+		queryBuffer1.WriteString(strings.Join(columns1, ", "))
+		queryBuffer1.WriteString(") VALUES(")
+		queryBuffer1.WriteString(GetPlaceHolder(cnt))
+		queryBuffer1.WriteString(");")
+		query1 := queryBuffer1.String()
+		stmt1, err := conn.Prepare(query1)
+		if nil != err {
+			log.Printf("Insert Syntax Error: %s\n\tError Query: %s : %s\n",
+				err.Error(), object.String(), query1)
+			return nil, err
+		}
+
+		defer stmt1.Close()
+
+		_, err = stmt1.Exec(params1...)
+		if nil != err {
+			log.Printf("Insert Execute Error: %s\nError Query: %s : %s\n",
+				err.Error(), object.String(), query1)
+			return nil, err
+		}
+		if rValue.Elem().Field(2).String() == "d" {
+			_, fileerr := os.Stat(model.RootDir + rValue.Elem().Field(0).String() + rValue.Elem().Field(1).String())
+
+			if os.IsNotExist(fileerr) {
+				errDir := os.MkdirAll(model.RootDir+rValue.Elem().Field(0).String()+rValue.Elem().Field(1).String(), 0755)
+				if errDir != nil {
+					log.Fatal(fileerr)
+				}
+
+			}
+		} else {
+
+			f, err := os.Create(model.RootDir + rValue.Elem().Field(0).String() + rValue.Elem().Field(1).String())
+
+			if err != nil {
+				fmt.Println(err)
+				f.Close()
+			}
+
+		}
+
+		// fmt.Println(value.Interface())
+
+		return result, nil
+	} else {
+		return nil, errors.New("You dont have permission of write") //create error massage
+	}
+}
+func DeleteFileFolder(conn *sql.DB, object model.IModel) (sql.Result, error) {
+	rValue := reflect.ValueOf(object)
+	rType := reflect.TypeOf(object)
+	var userid, filefolderPath, filefolderName string
+
+	for idx := 0; idx < rValue.Elem().NumField(); idx++ {
+		field := rType.Elem().Field(idx)
+		value := rValue.Elem().Field(idx)
+		column := field.Tag.Get("column")
+		if column == "filefolderPath" {
+			filefolderPath = value.String()
+		}
+		if column == "filefolderName" {
+			filefolderName = value.String()
+		}
+		// if column == "filesOrFolderId" {
+		// 	filesOrFolderId = value.String()
+		// }
+		if column == "userId" {
+			userid = value.String()
+		}
+	}
+	fmt.Println(filefolderName)
+	obj1 := new(model.ScanData)
+	_ = conn.QueryRow("select count(*) as count from userPermission where userId='" + userid + "'and filefolderPath= '" + filefolderPath + "' and permissionValue='w';").Scan(&obj1.WritePermissionusr)
+	// fmt.Println("write permission :", obj1.WritePermissionusr, userid, filefolderPath)
+	_ = conn.QueryRow("select count(*) as count from (select permissionValue from groupPermission where groupName IN (select groupName from userGroupMap where userId='" + userid + "') AND filefolderPath='" + filefolderPath + "' AND permissionValue='w') AS writePermission;").Scan(&obj1.WritePermissiongrp)
+	// fmt.Println("write permission :", obj1.WritePermissiongrp, userid, filefolderPath)
+	if obj1.WritePermissionusr > 0 || obj1.WritePermissiongrp > 0 {
+		var queryBuffer bytes.Buffer
+		var str = " WHERE filefolderPath='" + filefolderPath + "' AND filefolderName='" + filefolderName + "' ; "
+		queryBuffer.WriteString("DELETE FROM userPermission " + str)
+		query := queryBuffer.String()
+		stmt, err := conn.Prepare(query)
+		if nil != err {
+			log.Printf("Delete Syntax Error: %s\n\tError Query: %s : %s\n",
+				err.Error(), object.String(), query)
+			return nil, err
+		}
+		defer stmt.Close()
+		result, err := stmt.Exec()
+		if nil != err {
+			log.Printf("Delete Execute Error: %s\nError Query: %s : %s\n",
+				err.Error(), object.String(), query)
+		}
+		var queryBuffer2 bytes.Buffer
+
+		queryBuffer2.WriteString("DELETE FROM groupPermission " + str)
+		query2 := queryBuffer2.String()
+		stmt2, err := conn.Prepare(query2)
+		if nil != err {
+			log.Printf("Delete Syntax Error: %s\n\tError Query: %s : %s\n",
+				err.Error(), object.String(), query2)
+			return nil, err
+		}
+		defer stmt.Close()
+		result, err2 := stmt2.Exec()
+		if nil != err2 {
+			log.Printf("Delete Execute Error: %s\nError Query: %s : %s\n",
+				err2.Error(), object.String(), query2)
+		}
+		var queryBuffer1 bytes.Buffer
+		queryBuffer1.WriteString("DELETE FROM filesfolder " + str)
+		query1 := queryBuffer1.String()
+		stmt1, err := conn.Prepare(query1)
+		if nil != err {
+			log.Printf("Delete Syntax Error: %s\n\tError Query: %s : %s\n",
+				err.Error(), object.String(), query1)
+			return nil, err
+		}
+		defer stmt.Close()
+		result, err1 := stmt1.Exec()
+		if nil != err1 {
+			log.Printf("Delete Execute Error: %s\nError Query: %s : %s\n",
+				err.Error(), object.String(), query1)
+		}
+		var filefold = model.RootDir + filefolderPath + filefolderName
+		// if filesOrFolderId == "d" {
+		_, fileerr := os.Stat(filefold)
+		if os.IsNotExist(fileerr) {
+			errDir := os.RemoveAll(filefold)
+			if errDir != nil {
+				log.Fatal(fileerr)
+			}
+
+		}
+		// } else {
+
+		// 	err = os.Remove(filefold)
+		// 	if err != nil {
+		// 		fmt.Println(err)
+		// 	}
+
+		// }
+
+		// fmt.Println(value.Interface())
+
+		return result, nil
+	} else {
+		return nil, errors.New("You dont have permission of Delete") //create error massage
+	}
+}
+
+//delete File and folder
 /**
  * Update existing row with key column
  */
@@ -547,6 +773,68 @@ func Authentication(conn *sql.DB, object model.IModel) (interface{}, error) {
 	}
 	return tag, nil
 }
+func GetFilesFold(conn *sql.DB, object model.IModel) (interface{}, error) {
+	rValue := reflect.ValueOf(object)
+	rType := reflect.TypeOf(object)
+
+	// columns := []string{}
+	// pointers := make([]interface{}, 0)
+	var filefolderPath, userId string
+	for idx := 0; idx < rValue.Elem().NumField(); idx++ {
+		field := rType.Elem().Field(idx)
+		value := rValue.Elem().Field(idx)
+		if COLUMN_INGNORE_FLAG == field.Tag.Get("ignore") {
+			continue
+		}
+
+		column := field.Tag.Get("column")
+		// columns = append(columns, column)
+		if column == "filefolderPath" {
+			filefolderPath = value.String()
+		}
+		if column == "userId" {
+			userId = value.String()
+		}
+		// pointers = append(pointers, rValue.Elem().Field(idx).Addr().Interface())
+		// fmt.Println(column, value.String())
+	}
+	fmt.Println(filefolderPath, userId)
+	objects := make([]interface{}, 0)
+
+	obj1 := new(model.SelFileFold)
+	_ = conn.QueryRow("select userType from users where userId='" + userId + "';").Scan(&obj1.UserType)
+	if obj1.UserType == "s" {
+		rows, err := conn.Query("select * from filesfolder where filefolderPath='" + filefolderPath + "';")
+		if err != nil {
+			log.Fatal("Query failed:", err.Error())
+		}
+		defer rows.Close()
+
+		columns, _ := rows.Columns()
+		// fmt.Println(columns)
+		// count := len(columns)
+		// recds, err := row.Columns()
+		// var v struct {
+		// 	Data []interface{}
+		// }
+		for rows.Next() {
+			values := make([]interface{}, len(columns))
+			valuePtrs := make([]interface{}, len(columns))
+			for i, _ := range columns {
+				valuePtrs[i] = &values[i]
+				// fmt.Println(valuePtrs[i], &values[i])
+			}
+			if err := rows.Scan(valuePtrs...); err != nil {
+				log.Fatal(err)
+			}
+			objects = append(objects, values)
+		}
+		// jsonMsg, err := json.Marshal(v)
+		return objects, nil
+
+	}
+	return nil, nil
+}
 
 func Logout(conn *sql.DB, object model.IModel) (sql.Result, error) {
 	rValue := reflect.ValueOf(object)
@@ -577,4 +865,87 @@ func Logout(conn *sql.DB, object model.IModel) (sql.Result, error) {
 	}
 
 	return result, err
+}
+
+func CreateGroup(conn *sql.DB, object model.IModel) (sql.Result, error) {
+	rValue := reflect.ValueOf(object)
+	rType := reflect.TypeOf(object)
+
+	columns := []string{}
+	var params []interface{}
+	columns1 := []string{}
+	var params1 []interface{}
+	count := 0
+	for idx := 0; idx < rValue.Elem().NumField(); idx++ {
+		field := rType.Elem().Field(idx)
+		value := rValue.Elem().Field(idx)
+
+		column := field.Tag.Get("column")
+		if column != "userId" && column != "sessionKey" {
+			fmt.Println(column)
+
+			columns = append(columns, column)
+			params = append(params, value.Interface())
+			// log.Printf("string of parameters:- ", value.Interface())
+		}
+		if column != "sessionKey" && column != "groupDescription" {
+			columns1 = append(columns1, column)
+			params1 = append(params1, value.Interface())
+		}
+		count++
+	}
+	fmt.Println("length of params:--  ", params)
+	var queryBuffer bytes.Buffer
+	queryBuffer.WriteString("INSERT INTO ")
+	queryBuffer.WriteString(object.Table())
+	queryBuffer.WriteString("(")
+	queryBuffer.WriteString(strings.Join(columns, ", "))
+	queryBuffer.WriteString(") VALUES(")
+	queryBuffer.WriteString(GetPlaceHolder(count - 2))
+	queryBuffer.WriteString(");")
+
+	query := queryBuffer.String()
+	stmt, err := conn.Prepare(query)
+	if nil != err {
+		log.Printf("Insert Syntax Error: %s\n\tError Query: %s : %s\n",
+			err.Error(), object.String(), query)
+		return nil, err
+	}
+
+	defer stmt.Close()
+
+	result, err := stmt.Exec(params...)
+	if nil != err {
+		log.Printf("Insert Execute Error: %s\nError Query: %s : %s\n",
+			err.Error(), object.String(), query)
+		return nil, err
+	}
+
+	var queryBuffer1 bytes.Buffer
+	queryBuffer1.WriteString("INSERT INTO ")
+	queryBuffer1.WriteString("whoGroupCreated ")
+	queryBuffer1.WriteString("(")
+	queryBuffer1.WriteString(strings.Join(columns1, ", "))
+	queryBuffer1.WriteString(") VALUES(")
+	queryBuffer1.WriteString(GetPlaceHolder(count - 2))
+	queryBuffer1.WriteString(");")
+
+	query1 := queryBuffer1.String()
+	stmt1, err := conn.Prepare(query1)
+	if nil != err {
+		log.Printf("Insert Syntax Error: %s\n\tError Query: %s : %s\n",
+			err.Error(), object.String(), query1)
+		return nil, err
+	}
+
+	defer stmt1.Close()
+	// result1, err := stmt1.Exec(params1...)
+	result1, err := stmt1.Exec(params1...)
+	fmt.Println(result1)
+	if nil != err {
+		log.Printf("Insert Execute Error: %s\nError Query: %s : %s\n",
+			err.Error(), object.String(), query1)
+		return nil, err
+	}
+	return result, nil
 }

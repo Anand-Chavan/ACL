@@ -22,6 +22,7 @@ func (acl *aclRepository) GetByID(cntx context.Context, id string) (interface{},
 }
 
 func (acl *aclRepository) GetByuserId(cntx context.Context, id string) (interface{}, error) {
+
 	obj := new(model.Acl)
 	return driver.GetByuserId(acl.conn, obj, id)
 }
@@ -37,9 +38,56 @@ func (acl *aclRepository) Create(cntx context.Context, obj interface{}) (interfa
 	// usr.Id = id
 	return result.RowsAffected, nil
 }
+func (acl *aclRepository) CreateFileFolder(cntx context.Context, obj interface{}) (interface{}, error) {
+	usr := obj.(model.CreateFileOrFolder)
+	result, err := driver.CreateFileFolder(acl.conn, &usr)
+	if nil != err {
+		return 0, err
+	}
+	return result.RowsAffected, nil
+}
+func (acl *aclRepository) DeleteFileFolder(cntx context.Context, obj interface{}) (interface{}, error) {
+	usr := obj.(model.CreateFileOrFolder)
+	result, err := driver.DeleteFileFolder(acl.conn, &usr)
+	if nil != err {
+		return 0, err
+	}
+	return result.RowsAffected, nil
+}
+func (acl *aclRepository) AddUserIntoGroup(cntx context.Context, obj interface{}) (interface{}, error) {
+	grp := obj.(model.UserAddToGroup)
+	result, err := driver.Create(acl.conn, &grp)
+	if nil != err {
+		return 0, err
+	}
+
+	// id, _ := result.LastInsertId()
+	// usr.Id = id
+	return result.RowsAffected, nil
+}
+func (acl *aclRepository) CreateGroup(cntx context.Context, obj interface{}) (interface{}, error) {
+	grp := obj.(model.Groups)
+	result, err := driver.CreateGroup(acl.conn, &grp)
+	if nil != err {
+		return 0, err
+	}
+
+	// id, _ := result.LastInsertId()
+	// usr.Id = id
+	return result.RowsAffected, nil
+}
+
 func (acl *aclRepository) Authentication(cntx context.Context, obj interface{}) (interface{}, error) {
 	auth := obj.(model.Auth)
 	usr1, err := driver.Authentication(acl.conn, &auth)
+	if nil != err {
+		return 0, err
+	}
+	return usr1, nil
+}
+func (acl *aclRepository) GetFilesFolder(cntx context.Context, obj interface{}) (interface{}, error) {
+	auth := obj.(model.GetFilesFold)
+	usr1, err := driver.GetFilesFold(acl.conn, &auth)
 	if nil != err {
 		return 0, err
 	}

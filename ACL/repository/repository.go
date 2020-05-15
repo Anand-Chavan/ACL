@@ -7,7 +7,12 @@ import (
 type IRepository interface {
 	GetByID(context.Context, string) (interface{}, error)
 	Create(context.Context, interface{}) (interface{}, error)
+	CreateFileFolder(context.Context, interface{}) (interface{}, error)
+	DeleteFileFolder(context.Context, interface{}) (interface{}, error)
+	CreateGroup(context.Context, interface{}) (interface{}, error)
+	AddUserIntoGroup(context.Context, interface{}) (interface{}, error)
 	Authentication(context.Context, interface{}) (interface{}, error)
+	GetFilesFolder(context.Context, interface{}) (interface{}, error)
 	Logout(context.Context, interface{}) (interface{}, error)
 	Update(context.Context, interface{}) (interface{}, error)
 	Delete(context.Context, string) error
@@ -26,7 +31,23 @@ func (repo *Repository) GetByID(cntx context.Context, id int64) (obj interface{}
 func (repo *Repository) Create(cntx context.Context, obj interface{}) (cobj interface{}, err error) {
 	return
 }
+
+func (repo *Repository) CreateFileFolder(cntx context.Context, obj interface{}) (cobj interface{}, err error) {
+	return
+}
+func (repo *Repository) DeleteFileFolder(cntx context.Context, obj interface{}) (cobj interface{}, err error) {
+	return
+}
+func (repo *Repository) CreateGroup(cntx context.Context, obj interface{}) (cobj interface{}, err error) {
+	return
+}
+func (repo *Repository) AddUserIntoGroup(cntx context.Context, obj interface{}) (cobj interface{}, err error) {
+	return
+}
 func (repo *Repository) Authentication(cntx context.Context, obj interface{}) (cobj interface{}, err error) {
+	return
+}
+func (repo *Repository) GetFilesFolder(cntx context.Context, obj interface{}) (cobj interface{}, err error) {
 	return
 }
 func (repo *Repository) Logout(cntx context.Context, obj interface{}) (cobj interface{}, err error) {

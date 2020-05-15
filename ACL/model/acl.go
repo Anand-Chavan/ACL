@@ -41,3 +41,77 @@ func (key *Key) Table() string {
 func (key *Key) String() string {
 	return Stringify(key)
 }
+
+type Groups struct {
+	GroupName        string `json:"groupName" column:"groupName"`
+	UserId           string `json:"userId" column:"userId"`
+	SessionKey       string `json:"sessionKey" column:"sessionKey"`
+	GroupDescription string `json:"groupDescription" column:"groupDescription"`
+}
+
+func (grp *Groups) Table() string {
+	return "groups"
+}
+
+func (grp *Groups) String() string {
+	return Stringify(grp)
+}
+
+type UserAddToGroup struct {
+	GroupName  string `json:"groupName" column:"groupName"`
+	UserId     string `json:"userId" column:"userId"`
+	SessionKey string `json:"sessionKey" column:"sessionKey"`
+}
+
+func (uatg *UserAddToGroup) Table() string {
+	return "userGroupMap"
+}
+
+func (uatg *UserAddToGroup) String() string {
+	return Stringify(uatg)
+}
+
+var (
+	RootDir string = "/home/sagar/gorootdir"
+)
+
+type CreateFileOrFolder struct {
+	FilefolderPath  string `json:"filefolderPath" column:"filefolderPath"`
+	FilefolderName  string `json:"filefolderName" column:"filefolderName"`
+	FilesOrFolderId string `json:"filesOrFolderId" column:"filesOrFolderId"`
+	SessionKey      string `json:"sessionKey" column:"sessionKey"`
+	UserId          string `json:"userId" column:"userId"`
+}
+
+func (filecrt *CreateFileOrFolder) Table() string {
+	return "filesfolder"
+}
+
+func (filecrt *CreateFileOrFolder) String() string {
+	return Stringify(filecrt)
+}
+
+type ScanData struct {
+	WritePermissionusr int `json:"id"`
+	WritePermissiongrp int `json:"id"`
+}
+
+type GetFilesFold struct {
+	FilefolderPath string `json:"filefolderPath" column:"filefolderPath"`
+	SessionKey     string `json:"sessionKey" column:"sessionKey"`
+	UserId         string `json:"userId" column:"userId"`
+}
+
+func (getfile *GetFilesFold) Table() string {
+	return "filesfolder"
+}
+
+func (getfile *GetFilesFold) String() string {
+	return Stringify(getfile)
+}
+
+type SelFileFold struct {
+	FilefolderPath string `json:"filefolderPath" column:"filefolderPath"`
+	FilefolderName string `json:"filefolderName" column:"filefolderName"`
+	UserType       string `json:"userType" column:"userType"`
+}
