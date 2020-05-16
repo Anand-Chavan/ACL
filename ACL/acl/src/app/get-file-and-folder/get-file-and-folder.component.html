@@ -1,0 +1,43 @@
+
+<div class="row" align="center">
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+    <ng-container matColumnDef="filePath">
+      <th mat-header-cell *matHeaderCellDef> filePath </th>
+      <td mat-cell *matCellDef="let element"> {{element.filePath}} </td>
+    </ng-container>
+
+
+    <ng-container matColumnDef="fileName">
+      <th mat-header-cell *matHeaderCellDef> fileName </th>
+      <td mat-cell *matCellDef="let element"> {{element.fileName}} </td>
+    </ng-container>
+
+
+    <ng-container matColumnDef="FileOrDirectory">
+      <th mat-header-cell *matHeaderCellDef> FileOrDirectory </th>
+      <td mat-cell *matCellDef="let element"> {{element.FileOrDirectory}} </td>
+    </ng-container>
+
+
+    <ng-container matColumnDef="Id">
+      <th mat-header-cell *matHeaderCellDef> Id </th>
+      <td mat-cell *matCellDef="let element"> {{element.Id}} </td>
+    </ng-container>
+
+
+     <ng-container matColumnDef="permission">
+      <th mat-header-cell *matHeaderCellDef> permission </th>
+      <td mat-cell *matCellDef="let element"> {{element.permission}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="operation">
+      <th mat-header-cell *matHeaderCellDef> operation </th>
+      <td mat-cell *matCellDef="let element;let i = index"><span class="material-icons" (click) ='performOperation(i)'>{{element.operation}}</span></td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>
+

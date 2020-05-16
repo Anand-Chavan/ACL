@@ -1,0 +1,130 @@
+.headers
+{
+	background-color: blue;
+	color: white;
+}
+
+.bodyStyle
+{
+	height: 650px;
+	background-color: rgb(158, 201, 232);
+}
+
+.icon
+{
+	padding-left: 200px;
+}
+
+.material-icons
+{
+	cursor:pointer;
+}
+
+.head
+{
+	background-color: rgb(9, 45, 227);
+	height:50px;
+	color:white;
+	font-size: 25px;
+}
+
+.icon_back
+{
+	padding-left: 90px;
+	cursor: pointer;
+}
+
+.icon_home
+{
+	padding-left: 50px;
+}
+
+.main
+{
+	/*background-color: rgb(201, 210, 240);*/
+	height:250px;
+	width:100%;
+	/*opacity: 1;*/
+	/*background-image:url('../assets/back14.jpeg');*/
+}
+
+
+.sidebar
+{
+	/*background-color: rgb(179, 182, 227);*/
+	height:250%;
+	width:114%;
+	/*background-image:url('../assets/back3.jpeg');*/
+	/*background-repeat: no-repeat;*/
+	/*opacity:0.5;*/
+}
+
+
+
+.text
+{
+	font-size: 20px;
+}
+
+
+.get
+{
+	background-color:rgb(9, 45, 227);
+	height: 100%;
+	width: 70%;	
+	color: white;
+	font-size: 15px;
+	/*opacity: 0;	*/
+	/*padding: 10px;																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										*/
+}
+
+.getInside
+{
+	background-color:rgb(9, 45, 227);
+	height: 30px;
+	width: 50px;	
+	color: white;
+	font-size: 10px;
+}
+
+.getMain
+{
+	padding: 10px;
+}
+
+.verticalLine 
+{
+  border-left: 1px solid green;
+}
+
+
+
+
+.login
+{
+	height: 250px;
+	width: 400px;
+}
+
+.post-card
+{
+	padding: 20px;
+	height: 450px;
+	width: 350px;
+	/*background-color: rgb(237, 240, 245);*/
+}
+
+.input
+{
+	width: 300px;
+}
+
+.operation
+{
+	font-size: 20px;
+	color:white;
+	background-color:blue;
+	height: 30px;
+	width: 200px;
+	/*padding: 5px;*/
+}

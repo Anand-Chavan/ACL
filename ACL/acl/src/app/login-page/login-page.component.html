@@ -1,0 +1,39 @@
+  <div *ngIf="loginSuccess==true">
+    <app-login></app-login>
+  </div>
+
+  <div *ngIf="firstLogin==true" align="center" style="padding: 100px" class="image3">
+    <mat-card class="login">
+        <form (submit)="login()" name="abc">
+          <div align="center" style="padding: 10px">
+            <!-- <mat-card  class="post-card"> -->
+            <div class="col">
+
+              <div class="row-2">
+                <mat-form-field class="input">
+                    <input matInput [(ngModel)]="userId" name="userId" placeholder="Enter The userId">
+                 </mat-form-field>
+              </div>
+
+              <div class="row-2">
+                <mat-form-field class="input" >
+                    <input matInput  class="input" [(ngModel)]="password" name="password" placeholder="Enter The Password">
+                 </mat-form-field>
+              </div>
+
+            </div>
+
+            <div class="row" >
+              <div class="col-6" style="padding: 15px">
+                <button mat-button class="get" type="reset">RESET</button>
+              </div>
+              <div class="col-6" style="padding: 15px">
+                <button mat-button class="get"  type="submit">LOGIN</button>
+              </div>
+
+            </div>
+          <!-- </mat-card> -->
+        </div>
+      </form>
+    </mat-card>
+  </div>
