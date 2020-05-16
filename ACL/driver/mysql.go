@@ -518,13 +518,23 @@ func GetGroupById(conn *sql.DB, object model.IModel, id string) ([]interface{}, 
 
 	var queryBuffer bytes.Buffer
 	// var params []interface{}
+	tag := model.NotPermit{}
 
-	queryBuffer.WriteString("SELECT ")
-	queryBuffer.WriteString(strings.Join(columns, ", "))
-	queryBuffer.WriteString(" FROM ")
-	queryBuffer.WriteString(object.Table())
-	queryBuffer.WriteString(" WHERE userId= '" + id + "';")
-
+	_ = conn.QueryRow("select userType from users where userId='" + id + "';").Scan(&tag.Msg)
+	// fmt.Println(tag.Msg, whocallToChange)
+	if tag.Msg == "s" {
+		queryBuffer.WriteString("SELECT ")
+		queryBuffer.WriteString(strings.Join(columns, ", "))
+		queryBuffer.WriteString(" FROM ")
+		queryBuffer.WriteString(object.Table())
+		queryBuffer.WriteString(" ;")
+	} else {
+		queryBuffer.WriteString("SELECT ")
+		queryBuffer.WriteString(strings.Join(columns, ", "))
+		queryBuffer.WriteString(" FROM ")
+		queryBuffer.WriteString(object.Table())
+		queryBuffer.WriteString(" WHERE userId= '" + id + "';")
+	}
 	query := queryBuffer.String()
 	row, err := conn.Query(query)
 	if nil != err {
