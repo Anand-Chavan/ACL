@@ -1,0 +1,50 @@
+
+<div align="center">
+	<mat-card class="matcard"><b style="font-size: 20px;color: blue">Add User Detail</b></mat-card>
+</div>
+
+<form (submit)="getValue()">
+	<div align="center" style="padding: 10px">
+		<mat-card  class="post-card">
+			<div class="col">
+
+				<div class="row-3">
+					<mat-form-field>
+					    <input matInput class="input" [(ngModel)]="userId" name="userId" placeholder="Enter The userId">
+					 </mat-form-field>
+				</div>
+					
+				<div class="row-3">
+					<mat-form-field>
+					    <input matInput [(ngModel)]="groupName" name="groupName" placeholder="Enter The groupName">
+					 </mat-form-field>
+				</div>
+
+				<div class="row-3">
+					<mat-form-field>
+					    <input matInput [(ngModel)]="groupDescription" name="groupDescription" placeholder="Enter The groupDescription">
+					 </mat-form-field>
+				</div>
+
+				<div class="row-3">
+					<mat-form-field>
+					    <input matInput [(ngModel)]="sessionKey" name="v" placeholder="Enter The sessionKey">
+					 </mat-form-field>
+				</div>
+
+
+
+			</div>
+
+			<div class="row" >
+				<div class="col-6" style="padding: 15px">
+					<button mat-button class="get" type="reset">RESET</button>
+				</div>
+				<div class="col-6" style="padding: 15px">
+					<button mat-button class="get"  type="submit">SUBMIT</button>
+				</div>
+
+			</div>
+		</mat-card>
+	</div>
+</form>

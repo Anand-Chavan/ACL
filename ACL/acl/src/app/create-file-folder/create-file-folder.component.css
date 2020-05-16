@@ -1,0 +1,27 @@
+.matcard
+{
+	width: 350px;
+	/*padding-top: 100px;*/
+}
+
+.post-card
+{
+	/*padding: 20px;*/
+	height: 450px;
+	width: 350px;
+	/*background-color: rgb(237, 240, 245);*/
+}
+
+.input
+{
+	width: 50px;
+}
+
+.get
+{
+	background-color:rgb(9, 45, 227);
+	height: 30px;
+	width: 50px;	
+	color: white;
+	font-size: 10px;																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																											
+}

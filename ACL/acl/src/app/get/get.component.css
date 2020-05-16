@@ -1,0 +1,24 @@
+.getInside
+{
+	background-color:rgb(9, 45, 227);
+	height: 30px;
+	width: 50px;	
+	color: white;
+	font-size: 10px;
+}
+
+table {
+  width: 100%;
+}
+
+.mat-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+
+.head-get
+{
+	width:200px;
+	background-color: red;
+	align-items: center;
+}

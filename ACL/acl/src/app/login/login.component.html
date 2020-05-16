@@ -1,0 +1,163 @@
+    
+
+    <header *ngIf="logoutState==false">
+      <mat-card class="head">
+        <div class="row">
+          <div class="col-7" [(ngModel)]="user" name="abc">
+            <b>{{user}}</b>
+          </div>
+
+          <div class="col-1" class="icon_home">
+					<button  class="gets" (click)="fileAndFolder()">GetFileAndFolders</button>
+			</div>
+
+          <div class="col-1" class="icon_home">
+	  		  <button class="gets" (click)="createContent()">createFileFolder</button>          
+	        </div>
+
+  		 <div class="col-1" class="icon_home">
+            <span class="material-icons" [matMenuTriggerFor]="menu" (click)="getItem()">group</span>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item *ngFor="let item of userArray;let i = index" (click)="getUser(item,i)">
+              	<div class="row">
+              		<div class="col-6">
+              			{{item}}
+              		</div>
+              		<div class="col-6">
+              			<span class="material-icons">{{icon[i]}}</span>
+              		</div>
+              	</div>
+              	
+              </button>
+            </mat-menu>
+          </div>
+        
+          <div class="col-1" class="icon_home">
+            <span class="material-icons" [matMenuTriggerFor]="menu" (click)="getItem()">account_circle</span>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item *ngFor="let item of userArray;let i = index" (click)="getUser(item,i)">
+              	<div class="row">
+              		<div class="col-6">
+              			{{item}}
+              		</div>
+              		<div class="col-6">
+              			Helllo
+              		</div>
+              	</div>
+              	
+              </button>
+            </mat-menu>
+          </div>
+
+	        <div class="col-1" class="icon_home">
+	  		  <span class="material-icons" (click)="logout()">settings_power</span>          
+	        </div>
+
+	        
+
+	        
+
+
+        </div>
+      </mat-card>
+
+
+      
+    </header>
+    <body  *ngIf="logoutState==false">
+    	<div >
+    		<div class="row">
+    			<div class="col-2" *ngIf="adminEnable==true">
+						<div class="row-2" style="padding: 10px">
+							<button  class="get" (click)="GetMethod()">GetAllUser</button>
+						</div>
+						<div class="row-2" style="padding: 10px">
+							<button  class="get" (click)="postMethod()">Create User</button>
+						</div>
+						<div class="row-2" style="padding: 10px">
+							<button  class="get" (click)="putMethod()">Create Group</button>
+						</div>
+						<div class="row-2" style="padding: 10px">
+							<button  class="get" (click)="deleteMethod()">Delete User</button>
+						</div>
+						<div class="row-2" style="padding: 10px">
+							<button  class="get" (click)="changePermission()">Change Permission</button>
+						</div>
+						
+    			</div>
+    			<div class="col-2" align="center">
+
+    					<div class="main" align="center"> 
+
+							<div *ngIf="fileFolderEnale==true" style="padding: 50px">
+								<app-get-file-and-folder></app-get-file-and-folder>
+							</div>
+
+
+							<div *ngIf="getEnable==true" style="padding: 50px">
+								<app-get></app-get>
+							</div>
+
+							<!-- POST -->
+
+							<div *ngIf="postEnable==true">
+								<div>
+									<app-post></app-post>
+								</div>
+							</div>
+
+							<!-- PUT -->
+
+							<div *ngIf="putEnable==true" style="padding: 50px">
+								<div>
+									<app-put></app-put>
+								</div>
+							</div>
+
+							<!-- DELETE -->
+
+							<div *ngIf="delEnable==true" style="padding: 50px">
+								<div>
+									<app-delete></app-delete>
+								</div>
+							</div>
+
+							<div *ngIf="createEnable==true" style="padding: 50px">
+								<div>
+									<app-create-file-folder></app-create-file-folder>
+								</div>
+							</div>
+
+							<div *ngIf="change==true" style="padding: 50px">
+								<div>
+									<app-create-file-folder></app-create-file-folder>
+								</div>
+							</div>
+							
+
+						</div>
+    			</div>
+    		</div>
+    	</div>
+    </body>
+
+
+
+
+
+
+
+
+
+ 	<!-- 		<div class="col-2">
+ 				<div class="col">
+ 
+ 				</div>
+ 			</div>
+
+		<div class="col-10" align="center">
+
+		</div>
+    	</div>
+    </body>
+ -->

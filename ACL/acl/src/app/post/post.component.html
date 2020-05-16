@@ -1,0 +1,55 @@
+
+<div align="center">
+	<mat-card class="matcard"><b style="font-size: 20px;color: blue">Add User Detail</b></mat-card>
+</div>
+
+<form (submit)="getValue()">
+	<div align="center" style="padding: 10px">
+		<mat-card  class="post-card">
+			<div class="col">
+
+				<div class="row-2">
+					<mat-form-field>
+					    <input matInput class="input" [(ngModel)]="uName" name="uName" placeholder="Enter The First Name">
+					 </mat-form-field>
+				</div>
+					
+				<div class="row-2">
+					<mat-form-field>
+					    <input matInput [(ngModel)]="userId" name="userId" placeholder="Enter The userId">
+					 </mat-form-field>
+				</div>
+
+				<div class="row-2">
+					<mat-form-field>
+					    <input matInput [(ngModel)]="password" name="password" placeholder="Enter The password">
+					 </mat-form-field>
+				</div>
+
+				<div class="row-2">
+					<mat-form-field>
+					    <input matInput [(ngModel)]="userType" name="userType" placeholder="Enter The userType">
+					 </mat-form-field>
+				</div>
+
+				<div class="row-2">
+					<mat-form-field>
+					    <input matInput [(ngModel)]="sessionKey" name="sessionKey" placeholder="Enter The sessionKey">
+					 </mat-form-field>
+				</div>
+
+
+			</div>
+
+			<div class="row" >
+				<div class="col-6" style="padding: 15px">
+					<button mat-button class="get" type="reset">RESET</button>
+				</div>
+				<div class="col-6" style="padding: 15px">
+					<button mat-button class="get"  type="submit">SUBMIT</button>
+				</div>
+
+			</div>
+		</mat-card>
+	</div>
+</form>
