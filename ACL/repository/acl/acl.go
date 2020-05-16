@@ -112,6 +112,14 @@ func (acl *aclRepository) Update(cntx context.Context, obj interface{}) (interfa
 	err := driver.UpdateById(acl.conn, &usr)
 	return obj, err
 }
+func (acl *aclRepository) ChangePermission(cntx context.Context, obj interface{}) (interface{}, error) {
+	auth := obj.(model.ChangePermission)
+	usr1, err := driver.ChangePermission(acl.conn, &auth)
+	if nil != err {
+		return 0, err
+	}
+	return usr1, nil
+}
 
 func (acl *aclRepository) Delete(cntx context.Context, id string) error {
 	obj := &model.Acl{UserId: id}

@@ -401,6 +401,102 @@ func UpdateById(conn *sql.DB, object model.IModel) error {
 
 	return err
 }
+func ChangePermission(conn *sql.DB, object model.IModel) (interface{}, error) {
+	rValue := reflect.ValueOf(object)
+	rType := reflect.TypeOf(object)
+
+	var whocallToChange, permissionValue, filesOrFolderId, useridOrGroupId, filefolderName, filefolderPath string
+
+	for idx := 0; idx < rValue.Elem().NumField(); idx++ {
+		field := rType.Elem().Field(idx)
+		value := rValue.Elem().Field(idx)
+		column := field.Tag.Get("column")
+		if column == "whocallToChange" {
+			whocallToChange = value.String()
+		}
+		if column == "filefolderPath" {
+			filefolderPath = value.String()
+		}
+		if column == "filefolderName" {
+			filefolderName = value.String()
+		}
+		if column == "useridOrGroupId" {
+			useridOrGroupId = value.String()
+		}
+		if column == "filesOrFolderId" {
+			filesOrFolderId = value.String()
+		}
+		if column == "permissionValue" {
+			permissionValue = value.String()
+		}
+	}
+	tag := model.NotPermit{}
+
+	_ = conn.QueryRow("select userType from users where userId='" + whocallToChange + "';").Scan(&tag.Msg)
+	// fmt.Println(tag.Msg, whocallToChange)
+	if tag.Msg == "s" {
+		// fmt.Println(whocallToChange, permissionValue)
+		var queryBuffer bytes.Buffer
+		queryBuffer.WriteString("UPDATE ")
+		queryBuffer.WriteString("userPermission")
+		queryBuffer.WriteString(" SET ")
+		queryBuffer.WriteString("permissionValue='" + permissionValue + "' ")
+		queryBuffer.WriteString(" WHERE ")
+		queryBuffer.WriteString("filefolderPath='" + filefolderPath + "' AND filefolderName='" + filefolderName + "' AND userId='" + useridOrGroupId)
+		queryBuffer.WriteString("' AND filesOrFolderId='" + filesOrFolderId + "'")
+		queryBuffer.WriteString(";")
+
+		query := queryBuffer.String()
+		// fmt.Println(query)
+		//	log.Println("Update statement is: %s", query)
+
+		stmt, err := conn.Prepare(query)
+		if nil != err {
+			log.Printf("Update Syntax Error: %s\n\tError Query: %s : %s\n",
+				err.Error(), object.String(), query)
+			return nil, err
+		}
+
+		defer stmt.Close()
+		_, err = stmt.Exec()
+		if nil != err {
+			log.Printf("Update Execute Error: %s\nError Query: %s : %s\n",
+				err.Error(), object.String(), query)
+		}
+
+		var queryBuffer1 bytes.Buffer
+		queryBuffer1.WriteString("UPDATE ")
+		queryBuffer1.WriteString("groupPermission")
+		queryBuffer1.WriteString(" SET ")
+		queryBuffer1.WriteString("permissionValue='" + permissionValue + "' ")
+		queryBuffer1.WriteString(" WHERE ")
+		queryBuffer1.WriteString("filefolderPath='" + filefolderPath + "' AND filefolderName='" + filefolderName + "' AND groupName='" + useridOrGroupId)
+		queryBuffer1.WriteString("' AND filesOrFolderId='" + filesOrFolderId + "'")
+		queryBuffer1.WriteString(";")
+
+		query1 := queryBuffer1.String()
+		// fmt.Println(query)
+		//	log.Println("Update statement is: %s", query)
+
+		stmt1, err := conn.Prepare(query1)
+		if nil != err {
+			log.Printf("Update Syntax Error: %s\n\tError Query: %s : %s\n",
+				err.Error(), object.String(), query1)
+			return nil, err
+		}
+
+		defer stmt.Close()
+		_, err = stmt1.Exec()
+		if nil != err {
+			log.Printf("Update Execute Error: %s\nError Query: %s : %s\n",
+				err.Error(), object.String(), query1)
+		}
+		tag.Msg = "update success"
+		return tag, err
+	}
+	tag.Msg = "you are Not Authorized user to Change Permission"
+	return tag, nil
+}
 func GetGroupById(conn *sql.DB, object model.IModel, id string) ([]interface{}, error) {
 	rValue := reflect.ValueOf(object)
 	rType := reflect.TypeOf(object)

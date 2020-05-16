@@ -16,6 +16,7 @@ type IRepository interface {
 	GetFilesFolder(context.Context, interface{}) (interface{}, error)
 	Logout(context.Context, interface{}) (interface{}, error)
 	Update(context.Context, interface{}) (interface{}, error)
+	ChangePermission(context.Context, interface{}) (interface{}, error)
 	Delete(context.Context, string) error
 	GetAll(context.Context) ([]interface{}, error)
 	SetAll(context.Context) ([]interface{}, error)
@@ -57,6 +58,9 @@ func (repo *Repository) Logout(cntx context.Context, obj interface{}) (cobj inte
 	return
 }
 
+func (repo *Repository) ChangePermission(cntx context.Context, obj interface{}) (cobj interface{}, err error) {
+	return
+}
 func (repo *Repository) Update(cntx context.Context, obj interface{}) (uobj interface{}, err error) {
 	return
 }

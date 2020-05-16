@@ -117,8 +117,30 @@ type SelFileFold struct {
 	UserType       string `json:"userType" column:"userType"`
 }
 
+type ChangePermission struct {
+	FilefolderPath  string `json:"filefolderPath" column:"filefolderPath"`
+	FilefolderName  string `json:"filefolderName" column:"filefolderName"`
+	UseridOrGroupId string `json:"useridOrGroupId" column:"useridOrGroupId"`
+	FilesOrFolderId string `json:"filesOrFolderId" column:"filesOrFolderId"`
+	PermissionValue string `json:"permissionValue" column:"permissionValue"`
+	WhocallToChange string `json:"whocallToChange" column:"whocallToChange"`
+	SessionKey      string `json:"sessionKey" column:"sessionKey"`
+}
+
+func (getfile *ChangePermission) Table() string {
+	return "filesfolder"
+}
+
+func (getfile *ChangePermission) String() string {
+	return Stringify(getfile)
+}
+
 // type ReadFile struct {
 // 	FilefolderPath string `json:"filefolderPath" column:"filefolderPath"`
 // 	FilefolderName string `json:"filefolderName" column:"filefolderName"`
 // 	UserId         string `json:"userId" column:"userId"`
 // }
+
+type NotPermit struct {
+	Msg string
+}

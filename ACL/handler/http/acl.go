@@ -39,6 +39,7 @@ func (acl *Acl) GetHTTPHandler() []*handler.HTTPHandler {
 		&handler.HTTPHandler{Authenticated: true, Method: http.MethodPost, Path: "deletefilefolder", Func: acl.DeleteFileFolder},
 		&handler.HTTPHandler{Authenticated: true, Method: http.MethodPost, Path: "getfilefolder", Func: acl.GetFilesFolder},
 		&handler.HTTPHandler{Authenticated: true, Method: http.MethodPut, Path: "acl/{userId}", Func: acl.Update},
+		&handler.HTTPHandler{Authenticated: true, Method: http.MethodPut, Path: "changepermission", Func: acl.ChangePermission},
 		&handler.HTTPHandler{Authenticated: true, Method: http.MethodDelete, Path: "acl/{userId}", Func: acl.Delete},
 		&handler.HTTPHandler{Authenticated: true, Method: http.MethodGet, Path: "acl", Func: acl.GetAll},
 		&handler.HTTPHandler{Authenticated: true, Method: http.MethodGet, Path: "acl1", Func: acl.SetAll},
@@ -77,21 +78,6 @@ func (acl *Acl) GetGroupById(w http.ResponseWriter, r *http.Request) {
 
 	handler.WriteJSONResponse(w, r, usr, http.StatusOK, nil)
 }
-
-// func (acl *Acl) Authentication(w http.ResponseWriter, r *http.Request) {
-// 	var usr model.Auth
-// 	var auth interface{}
-// 	err := json.NewDecoder(r.Body).Decode(&usr)
-// 	for {
-// 		if nil != err {
-// 			break
-// 		}
-
-// 		auth, err = acl.repo.Authentication(r.Context(), usr)
-// 		break
-// 	}
-// 	handler.WriteJSONResponse(w, r, auth, http.StatusOK, err)
-// }
 
 func (acl *Acl) GetByID(w http.ResponseWriter, r *http.Request) {
 	var usr interface{}
@@ -224,6 +210,21 @@ func (acl *Acl) CreateGroup(w http.ResponseWriter, r *http.Request) {
 	handler.WriteJSONResponse(w, r, grp, http.StatusOK, err)
 }
 
+func (acl *Acl) ChangePermission(w http.ResponseWriter, r *http.Request) {
+	var usr model.ChangePermission
+	var auth interface{}
+	err := json.NewDecoder(r.Body).Decode(&usr)
+	for {
+		if nil != err {
+			break
+		}
+
+		auth, err = acl.repo.ChangePermission(r.Context(), usr)
+		break
+	}
+	handler.WriteJSONResponse(w, r, auth, http.StatusOK, err)
+
+}
 func (acl *Acl) Update(w http.ResponseWriter, r *http.Request) {
 	var iUsr interface{}
 	userId := chi.URLParam(r, "userId")
