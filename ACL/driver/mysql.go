@@ -1014,7 +1014,8 @@ func GetFilesFold(conn *sql.DB, object model.IModel, limit, offset int64) ([]int
 
 	} else {
 
-		queryBuffer.WriteString("select * from groupPermission where filefolderPath='" + filefolderPath + "' AND groupName IN (select groupName from userGroupMap where userId='" + userId + "') ;")
+		queryBuffer.WriteString("select * from groupPermission where  groupName IN (select groupName from userGroupMap where userId='" + userId + "') ;")
+		// queryBuffer.WriteString("select * from groupPermission where filefolderPath='" + filefolderPath + "' AND groupName IN (select groupName from userGroupMap where userId='" + userId + "') ;")
 		query := queryBuffer.String()
 		// fmt.Println(query)
 		row, err := conn.Query(query)
@@ -1048,7 +1049,8 @@ func GetFilesFold(conn *sql.DB, object model.IModel, limit, offset int64) ([]int
 
 		}
 		var queryBuffer1 bytes.Buffer
-		queryBuffer1.WriteString("select * from userPermission where filefolderPath='" + filefolderPath + "' AND userId='" + userId + "';")
+		queryBuffer1.WriteString("select * from userPermission where  userId='" + userId + "';")
+		// queryBuffer1.WriteString("select * from userPermission where filefolderPath='" + filefolderPath + "' AND userId='" + userId + "';")
 		query1 := queryBuffer1.String()
 		// fmt.Println(query)
 		row1, err := conn.Query(query1)

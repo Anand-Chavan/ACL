@@ -19,9 +19,11 @@ Out: {"status":200,"data":{"groupName":"abc6","userId":"sagar","sessionKey":"abc
 curl -X POST -d '{"userId":"u1","groupName":"abc6","sessionKey":"abcd"}' http://localhost:9090/webapi/v1/adduserintogroup
 OUT:{"status":200,"data":{"groupName":"abc6","userId":"u1","sessionKey":"abcd"}}
 
-//Get File or directory  with respect to there permission 
-curl -X POST -d '{"filefolderPath":"/" ,"userId":"u2"}' http://localhost:9090/webapi/v1/getfilefolder
-OUT:{"status":200,"data":[["/","unifile.txt","f","g2","r"],["/","test10.txt","f","u2","w"],["/","test7.txt","f","u2","w"],["/","test9.txt","f","u2","w"],["/","unifile.txt","f","u2","w"]]}
+//Get File or directory  with respect to there permission
+curl -X POST -d '{"userId":"u2"}' http://localhost:9090/webapi/v1/getfilefolder
+{"status":200,"data":[["/","unifile.txt","f","g2","r"],["/university/compsci/","compfile.txt","f","g2","w"],["/","test10.txt","f","u2","r"],["/","test11","d","u2","w"],["/","test7.txt","f","u2","w"],["/","test9.txt","f","u2","w"],["/","unifile.txt","f","u2","w"]]} 
+//curl -X POST -d '{"filefolderPath":"/" ,"userId":"u2"}' http://localhost:9090/webapi/v1/getfilefolder
+//OUT:{"status":200,"data":[["/","unifile.txt","f","g2","r"],["/","test10.txt","f","u2","w"],["/","test7.txt","f","u2","w"],["/","test9.txt","f","u2","w"],["/","unifile.txt","f","u2","w"]]}
 
 //Create folder and files according to permission
 curl -X POST -d '{"filefolderPath":"/","filefolderName":"test10","filesOrFolderId":"d" ,"userId":"sagar","sessionKey":"abcd"}' http://localhost:9090/webapi/v1/createfilefolder
