@@ -65,7 +65,7 @@ func Create(conn *sql.DB, object model.IModel) (sql.Result, error) {
 
 	columns := []string{}
 	var params []interface{}
-
+	var sessionKey string
 	count := 0
 	for idx := 0; idx < rValue.Elem().NumField(); idx++ {
 		field := rType.Elem().Field(idx)
@@ -78,11 +78,21 @@ func Create(conn *sql.DB, object model.IModel) (sql.Result, error) {
 
 		column := field.Tag.Get("column")
 		// fmt.Println(column)
+		if column == "sessionKey" {
+			sessionKey = value.String()
+		}
 		if column != "sessionKey" {
 			columns = append(columns, column)
 			params = append(params, value.Interface())
 			count++
 		}
+	}
+	tag := model.NotPermit{}
+	// fmt.Println(sessionKey)
+	err := conn.QueryRow("select sessionKey from usersKey where sessionKey ='" + sessionKey + "';").Scan(&tag.Msg)
+	// log.Printf(tag.Msg)
+	if err != nil {
+		return nil, errors.New("session Expire")
 	}
 
 	var queryBuffer bytes.Buffer
@@ -112,6 +122,9 @@ func Create(conn *sql.DB, object model.IModel) (sql.Result, error) {
 	}
 
 	return result, nil
+
+	// tag.Msg = "session Expire"
+
 }
 
 func CreateFileFolder(conn *sql.DB, object model.IModel) (sql.Result, error) {
@@ -124,7 +137,7 @@ func CreateFileFolder(conn *sql.DB, object model.IModel) (sql.Result, error) {
 	var params1 []interface{}
 	count := 0
 	cnt := 0
-	var userid, filefolderPath string
+	var userid, filefolderPath, sessionKey string
 	for idx := 0; idx < rValue.Elem().NumField(); idx++ {
 		field := rType.Elem().Field(idx)
 		value := rValue.Elem().Field(idx)
@@ -141,6 +154,9 @@ func CreateFileFolder(conn *sql.DB, object model.IModel) (sql.Result, error) {
 			count++
 			cnt++
 		}
+		if column == "sessionKey" {
+			sessionKey = value.String()
+		}
 		if column == "userId" {
 			columns1 = append(columns1, column)
 			params1 = append(params1, value.Interface())
@@ -148,6 +164,13 @@ func CreateFileFolder(conn *sql.DB, object model.IModel) (sql.Result, error) {
 			userid = value.String()
 		}
 		// fmt.Println(params, columns)
+	}
+	tag := model.NotPermit{}
+	// fmt.Println(sessionKey)
+	err := conn.QueryRow("select sessionKey from usersKey where sessionKey ='" + sessionKey + "';").Scan(&tag.Msg)
+	// log.Printf(tag.Msg)
+	if err != nil {
+		return nil, errors.New("session Expire")
 	}
 	// var writepermission int
 	obj1 := new(model.ScanData)
@@ -236,7 +259,7 @@ func CreateFileFolder(conn *sql.DB, object model.IModel) (sql.Result, error) {
 func DeleteFileFolder(conn *sql.DB, object model.IModel) (sql.Result, error) {
 	rValue := reflect.ValueOf(object)
 	rType := reflect.TypeOf(object)
-	var userid, filefolderPath, filefolderName string
+	var userid, filefolderPath, filefolderName, sessionKey string
 
 	for idx := 0; idx < rValue.Elem().NumField(); idx++ {
 		field := rType.Elem().Field(idx)
@@ -248,6 +271,9 @@ func DeleteFileFolder(conn *sql.DB, object model.IModel) (sql.Result, error) {
 		if column == "filefolderName" {
 			filefolderName = value.String()
 		}
+		if column == "sessionKey" {
+			sessionKey = value.String()
+		}
 		// if column == "filesOrFolderId" {
 		// 	filesOrFolderId = value.String()
 		// }
@@ -255,7 +281,14 @@ func DeleteFileFolder(conn *sql.DB, object model.IModel) (sql.Result, error) {
 			userid = value.String()
 		}
 	}
-	fmt.Println(filefolderName)
+	tag := model.NotPermit{}
+	// fmt.Println(sessionKey)
+	err := conn.QueryRow("select sessionKey from usersKey where sessionKey ='" + sessionKey + "';").Scan(&tag.Msg)
+	// log.Printf(tag.Msg)
+	if err != nil {
+		return nil, errors.New("session Expire")
+	}
+	// fmt.Println(filefolderName)
 	obj1 := new(model.ScanData)
 	_ = conn.QueryRow("select count(*) as count from userPermission where userId='" + userid + "'and filefolderPath= '" + filefolderPath + "' and permissionValue='w';").Scan(&obj1.WritePermissionusr)
 	// fmt.Println("write permission :", obj1.WritePermissionusr, userid, filefolderPath)
@@ -349,7 +382,7 @@ func UpdateById(conn *sql.DB, object model.IModel) error {
 
 	keyColumns := []string{}
 	var keyParams []interface{}
-
+	var sessionKey string
 	for idx := 0; idx < rValue.Elem().NumField(); idx++ {
 		field := rType.Elem().Field(idx)
 		value := rValue.Elem().Field(idx)
@@ -360,20 +393,31 @@ func UpdateById(conn *sql.DB, object model.IModel) error {
 		// }
 
 		column := field.Tag.Get("column")
-		if COLUMN_PRIMARY == field.Tag.Get("key") {
-			keyColumns = append(keyColumns, column+" = ?")
-			keyParams = append(keyParams, value.Interface())
+		if column != "sessionKey" {
+			sessionKey = value.String()
+		}
+		if column != "sessionKey" {
+			if COLUMN_PRIMARY == field.Tag.Get("key") {
+				keyColumns = append(keyColumns, column+" = ?")
+				keyParams = append(keyParams, value.Interface())
 
-		} else {
-			columns = append(columns, column+" = ?")
-			params = append(params, value.Interface())
+			} else {
+				columns = append(columns, column+" = ?")
+				params = append(params, value.Interface())
+			}
 		}
 	}
 
 	for _, param := range keyParams {
 		params = append(params, param)
 	}
-
+	tag := model.NotPermit{}
+	// fmt.Println(sessionKey)
+	err := conn.QueryRow("select sessionKey from usersKey where sessionKey ='" + sessionKey + "';").Scan(&tag.Msg)
+	// log.Printf(tag.Msg)
+	if err != nil {
+		return errors.New("session Expire")
+	}
 	var queryBuffer bytes.Buffer
 	queryBuffer.WriteString("UPDATE ")
 	queryBuffer.WriteString(object.Table())
@@ -405,7 +449,7 @@ func ChangePermission(conn *sql.DB, object model.IModel) (interface{}, error) {
 	rValue := reflect.ValueOf(object)
 	rType := reflect.TypeOf(object)
 
-	var whocallToChange, permissionValue, filesOrFolderId, useridOrGroupId, filefolderName, filefolderPath string
+	var whocallToChange, sessionKey, permissionValue, filesOrFolderId, useridOrGroupId, filefolderName, filefolderPath string
 
 	for idx := 0; idx < rValue.Elem().NumField(); idx++ {
 		field := rType.Elem().Field(idx)
@@ -429,11 +473,20 @@ func ChangePermission(conn *sql.DB, object model.IModel) (interface{}, error) {
 		if column == "permissionValue" {
 			permissionValue = value.String()
 		}
+		if column == "sessionKey" {
+			sessionKey = value.String()
+		}
 	}
+	// tag := model.NotPermit{}
 	tag := model.NotPermit{}
-
+	// fmt.Println(sessionKey)
+	err := conn.QueryRow("select sessionKey from usersKey where sessionKey ='" + sessionKey + "';").Scan(&tag.Msg)
+	// log.Printf(tag.Msg)
+	if err != nil {
+		return nil, errors.New("session Expire")
+	}
 	_ = conn.QueryRow("select userType from users where userId='" + whocallToChange + "';").Scan(&tag.Msg)
-	// fmt.Println(tag.Msg, whocallToChange)
+	fmt.Println(tag.Msg, whocallToChange)
 	if tag.Msg == "s" {
 		// fmt.Println(whocallToChange, permissionValue)
 		var queryBuffer bytes.Buffer
@@ -950,7 +1003,7 @@ func GetFilesFold(conn *sql.DB, object model.IModel, limit, offset int64) ([]int
 	rType := reflect.TypeOf(object)
 
 	columns := []string{}
-	var filefolderPath, userId string
+	var filefolderPath, userId, sessionKey string
 
 	for idx := 0; idx < rValue.Elem().NumField(); idx++ {
 		field := rType.Elem().Field(idx)
@@ -964,6 +1017,9 @@ func GetFilesFold(conn *sql.DB, object model.IModel, limit, offset int64) ([]int
 		if column == "userId" {
 			userId = value.String()
 		}
+		if column == "sessionKey" {
+			sessionKey = value.String()
+		}
 		if column != "sessionKey" && column != "userId" {
 
 			if column == "filefolderPath" {
@@ -973,6 +1029,13 @@ func GetFilesFold(conn *sql.DB, object model.IModel, limit, offset int64) ([]int
 			columns = append(columns, column)
 			//pointers = append(pointers, rValue.Elem().Field(idx).Addr().Interface())
 		}
+	}
+	tag := model.NotPermit{}
+	// fmt.Println(sessionKey)
+	err := conn.QueryRow("select sessionKey from usersKey where sessionKey ='" + sessionKey + "';").Scan(&tag.Msg)
+	// log.Printf(tag.Msg)
+	if err != nil {
+		return nil, errors.New("session Expire")
 	}
 
 	var queryBuffer bytes.Buffer
@@ -1100,7 +1163,7 @@ func GetFilesFold(conn *sql.DB, object model.IModel, limit, offset int64) ([]int
 
 }
 
-func Logout(conn *sql.DB, object model.IModel) (sql.Result, error) {
+func Logout(conn *sql.DB, object model.IModel) (interface{}, error) {
 	rValue := reflect.ValueOf(object)
 	// rType := reflect.TypeOf(object)
 	var queryBuffer bytes.Buffer
@@ -1122,13 +1185,14 @@ func Logout(conn *sql.DB, object model.IModel) (sql.Result, error) {
 	}
 
 	defer stmt.Close()
-	result, err := stmt.Exec()
+	_, err = stmt.Exec()
 	if nil != err {
 		log.Printf("Delete Execute Error: %s\nError Query: %s : %s\n",
 			err.Error(), object.String(), query)
 	}
-
-	return result, err
+	tag := model.NotPermit{}
+	tag.Msg = "logout success"
+	return tag, err
 }
 
 func CreateGroup(conn *sql.DB, object model.IModel) (sql.Result, error) {
@@ -1140,7 +1204,7 @@ func CreateGroup(conn *sql.DB, object model.IModel) (sql.Result, error) {
 	columns1 := []string{}
 	var params1 []interface{}
 	count := 0
-	var groupName, userId string
+	var groupName, userId, sessionKey string
 
 	for idx := 0; idx < rValue.Elem().NumField(); idx++ {
 		field := rType.Elem().Field(idx)
@@ -1153,8 +1217,11 @@ func CreateGroup(conn *sql.DB, object model.IModel) (sql.Result, error) {
 		if column == "groupName" {
 			groupName = value.String()
 		}
+		if column == "sessionKey" {
+			sessionKey = value.String()
+		}
 		if column != "userId" && column != "sessionKey" {
-			fmt.Println(column)
+			// fmt.Println(column)
 
 			columns = append(columns, column)
 			params = append(params, value.Interface())
@@ -1165,8 +1232,16 @@ func CreateGroup(conn *sql.DB, object model.IModel) (sql.Result, error) {
 			params1 = append(params1, value.Interface())
 		}
 		count++
+
 	}
-	fmt.Println("length of params:--  ", params)
+	tag := model.NotPermit{}
+	// fmt.Println(sessionKey)
+	err := conn.QueryRow("select sessionKey from usersKey where sessionKey ='" + sessionKey + "';").Scan(&tag.Msg)
+	// log.Printf(tag.Msg)
+	if err != nil {
+		return nil, errors.New("session Expire")
+	}
+	// fmt.Println("length of params:--  ", params)
 	var queryBuffer bytes.Buffer
 	queryBuffer.WriteString("INSERT INTO ")
 	queryBuffer.WriteString(object.Table())

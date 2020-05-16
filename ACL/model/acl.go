@@ -2,10 +2,11 @@ package model
 
 type Acl struct {
 	// Id       int64  `json:"id,omitempty" key:"primary" autoincr:"1" column:"id"`
-	UserName string `json:"uName" column:"uName"`
-	UserId   string `json:"userId" column:"userId"`
-	Password string `json:"password" column:"password"`
-	UserType string `json:"userType" column:"userType"`
+	UserName   string `json:"uName ,omitempty" key:"primary" column:"uName"`
+	UserId     string `json:"userId" column:"userId"`
+	Password   string `json:"password" column:"password"`
+	UserType   string `json:"userType" column:"userType"`
+	SessionKey string `json:"sessionKey" column:"sessionKey"`
 }
 
 func (acl *Acl) Table() string {
