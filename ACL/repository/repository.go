@@ -6,6 +6,7 @@ import (
 
 type IRepository interface {
 	GetByID(context.Context, string) (interface{}, error)
+	GetUserByGroupId(context.Context, string) (interface{}, error)
 	GetGroupById(context.Context, string) (interface{}, error)
 	Create(context.Context, interface{}) (interface{}, error)
 	CreateFileFolder(context.Context, interface{}) (interface{}, error)
@@ -19,7 +20,7 @@ type IRepository interface {
 	ChangePermission(context.Context, interface{}) (interface{}, error)
 	Delete(context.Context, string) error
 	GetAll(context.Context) ([]interface{}, error)
-	SetAll(context.Context) ([]interface{}, error)
+	GetAllGroups(context.Context) ([]interface{}, error)
 	GetByuserId(context.Context, string) (interface{}, error)
 }
 
@@ -27,6 +28,10 @@ type Repository struct {
 }
 
 func (repo *Repository) GetByID(cntx context.Context, id int64) (obj interface{}, err error) {
+	return
+}
+
+func (repo *Repository) GetUserByGroupId(cntx context.Context, id int64) (obj interface{}, err error) {
 	return
 }
 func (repo *Repository) GetGroupById(cntx context.Context, id int64) (obj interface{}, err error) {
@@ -72,7 +77,7 @@ func (repo *Repository) Delete(cntx context.Context, id int64) (deleted bool, er
 func (repo *Repository) GetAll(cntx context.Context) (obj []interface{}, err error) {
 	return
 }
-func (repo *Repository) SetAll(cntx context.Context) (obj []interface{}, err error) {
+func (repo *Repository) GetAllGroups(cntx context.Context) (obj []interface{}, err error) {
 	return
 }
 

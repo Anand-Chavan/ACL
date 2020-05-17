@@ -629,6 +629,81 @@ func GetGroupById(conn *sql.DB, object model.IModel, id string) ([]interface{}, 
 
 }
 
+func GetUserByGroupId(conn *sql.DB, object model.IModel, id string) ([]interface{}, error) {
+	rValue := reflect.ValueOf(object)
+	rType := reflect.TypeOf(object)
+
+	columns := []string{}
+	//pointers := make([]interface{}, 0)
+
+	for idx := 0; idx < rValue.Elem().NumField(); idx++ {
+		field := rType.Elem().Field(idx)
+		if COLUMN_INGNORE_FLAG == field.Tag.Get("ignore") {
+			continue
+		}
+		column := field.Tag.Get("column")
+		if column != "sessionKey" {
+			columns = append(columns, column)
+		}
+		//pointers = append(pointers, rValue.Elem().Field(idx).Addr().Interface())
+	}
+
+	var queryBuffer bytes.Buffer
+	// // var params []interface{}
+	// tag := model.NotPermit{}
+
+	// _ = conn.QueryRow("select userType from users where userId='" + id + "';").Scan(&tag.Msg)
+	// fmt.Println(tag.Msg, whocallToChange)
+	// if tag.Msg == "s" {
+	// 	queryBuffer.WriteString("SELECT ")
+	// 	queryBuffer.WriteString(strings.Join(columns, ", "))
+	// 	queryBuffer.WriteString(" FROM ")
+	// 	queryBuffer.WriteString(object.Table())
+	// 	queryBuffer.WriteString(" ;")
+	// } else {
+	queryBuffer.WriteString("SELECT ")
+	queryBuffer.WriteString(strings.Join(columns, ", "))
+	queryBuffer.WriteString(" FROM ")
+	queryBuffer.WriteString(object.Table())
+	queryBuffer.WriteString(" WHERE groupName= '" + id + "';")
+	// }
+	query := queryBuffer.String()
+	row, err := conn.Query(query)
+	if nil != err {
+		log.Printf("Error conn.Query: %s\n\tError Query: %s\n", err.Error(), query)
+		return nil, err
+	}
+	objects := make([]interface{}, 0)
+	recds, err := row.Columns()
+	if nil != err {
+		log.Printf("Error conn.Query: %s\n\tError Query: %s\n", err.Error(), query)
+		return nil, err
+	}
+	defer row.Close()
+	for row.Next() {
+		if nil != err {
+			log.Printf("Error row.Columns(): %s\n\tError Query: %s\n", err.Error(), query)
+			return nil, err
+		}
+		values := make([]interface{}, len(recds))
+		recdsWrite := make([]string, len(recds))
+		for index, _ := range recds {
+			values[index] = &recdsWrite[index]
+		}
+		err = row.Scan(values...)
+		if nil != err {
+			log.Printf("Error: row.Scan: %s\n", err.Error())
+			return nil, err
+		}
+
+		objects = append(objects, values)
+
+	}
+
+	return objects, nil
+
+}
+
 func GetById(conn *sql.DB, object model.IModel, id string) (model.IModel, error) {
 	rValue := reflect.ValueOf(object)
 	rType := reflect.TypeOf(object)
@@ -741,6 +816,74 @@ func GetByuserId(conn *sql.DB, object model.IModel, id string) (model.IModel, er
 	return object, nil
 }
 
+func GetAllGroups(conn *sql.DB, object model.IModel, limit, offset int64) ([]interface{}, error) {
+	rValue := reflect.ValueOf(object)
+	rType := reflect.TypeOf(object)
+
+	columns := []string{}
+	//pointers := make([]interface{}, 0)
+
+	for idx := 0; idx < rValue.Elem().NumField(); idx++ {
+		field := rType.Elem().Field(idx)
+		if COLUMN_INGNORE_FLAG == field.Tag.Get("ignore") {
+			continue
+		}
+
+		column := field.Tag.Get("column")
+		if column != "sessionKey" {
+			columns = append(columns, column)
+		}
+		//pointers = append(pointers, rValue.Elem().Field(idx).Addr().Interface())
+	}
+
+	var queryBuffer bytes.Buffer
+	var params []interface{}
+
+	queryBuffer.WriteString("SELECT ")
+	queryBuffer.WriteString(strings.Join(columns, ", "))
+	queryBuffer.WriteString(" FROM ")
+	queryBuffer.WriteString(object.Table())
+	if 0 != limit && 0 != offset {
+		queryBuffer.WriteString(" LIMIT ? OFFSET ?")
+		params = append(params, limit)
+		params = append(params, offset)
+	}
+
+	query := queryBuffer.String()
+	row, err := conn.Query(query)
+	if nil != err {
+		log.Printf("Error conn.Query: %s\n\tError Query: %s\n", err.Error(), query)
+		return nil, err
+	}
+	objects := make([]interface{}, 0)
+	recds, err := row.Columns()
+	if nil != err {
+		log.Printf("Error conn.Query: %s\n\tError Query: %s\n", err.Error(), query)
+		return nil, err
+	}
+	defer row.Close()
+	for row.Next() {
+		if nil != err {
+			log.Printf("Error row.Columns(): %s\n\tError Query: %s\n", err.Error(), query)
+			return nil, err
+		}
+		values := make([]interface{}, len(recds))
+		recdsWrite := make([]string, len(recds))
+		for index, _ := range recds {
+			values[index] = &recdsWrite[index]
+		}
+		err = row.Scan(values...)
+		if nil != err {
+			log.Printf("Error: row.Scan: %s\n", err.Error())
+			return nil, err
+		}
+
+		objects = append(objects, values)
+
+	}
+
+	return objects, nil
+}
 func GetAll(conn *sql.DB, object model.IModel, limit, offset int64) ([]interface{}, error) {
 	rValue := reflect.ValueOf(object)
 	rType := reflect.TypeOf(object)
@@ -755,7 +898,9 @@ func GetAll(conn *sql.DB, object model.IModel, limit, offset int64) ([]interface
 		}
 
 		column := field.Tag.Get("column")
-		columns = append(columns, column)
+		if column != "sessionKey" {
+			columns = append(columns, column)
+		}
 		//pointers = append(pointers, rValue.Elem().Field(idx).Addr().Interface())
 	}
 

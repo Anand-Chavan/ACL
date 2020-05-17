@@ -146,3 +146,15 @@ func (getfile *ChangePermission) String() string {
 type NotPermit struct {
 	Msg string
 }
+type GetAllGroups struct {
+	UserId    string `json:"userId" column:"userId"`
+	GroupName string `json:"groupName" column:"groupName"`
+}
+
+func (getfile *GetAllGroups) Table() string {
+	return "userGroupMap"
+}
+
+func (getfile *GetAllGroups) String() string {
+	return Stringify(getfile)
+}

@@ -42,7 +42,8 @@ func (acl *Acl) GetHTTPHandler() []*handler.HTTPHandler {
 		&handler.HTTPHandler{Authenticated: true, Method: http.MethodPut, Path: "changepermission", Func: acl.ChangePermission},
 		&handler.HTTPHandler{Authenticated: true, Method: http.MethodDelete, Path: "acl/{userId}", Func: acl.Delete},
 		&handler.HTTPHandler{Authenticated: true, Method: http.MethodGet, Path: "acl", Func: acl.GetAll},
-		&handler.HTTPHandler{Authenticated: true, Method: http.MethodGet, Path: "acl1", Func: acl.SetAll},
+		&handler.HTTPHandler{Authenticated: true, Method: http.MethodGet, Path: "getgroups/{groupId}", Func: acl.GetUserByGroupId},
+		&handler.HTTPHandler{Authenticated: true, Method: http.MethodGet, Path: "getgroups", Func: acl.GetAllGroups},
 	}
 }
 
@@ -50,23 +51,23 @@ func (acl *Acl) GetByuserId(w http.ResponseWriter, r *http.Request) {
 	var usr interface{}
 
 	userId := chi.URLParam(r, "userId")
-	//id := chi.URLParam(r, "userId")
-	//userId := chi.URLParam(r, "userId")
-	// for {
-	// 	// if nil != err {
-	// 	// 	break
-	// 	// }
 
-	// 	usr, _ = acl.repo.GetByuserId(r.Context(), id)
-	// 	break
-	// }
-	usr, _ = acl.repo.GetByuserId(r.Context(), userId)
+	usr, err := acl.repo.GetByuserId(r.Context(), userId)
 
-	handler.WriteJSONResponse(w, r, usr, http.StatusOK, errors.New("No Errors"))
+	handler.WriteJSONResponse(w, r, usr, http.StatusOK, err)
+}
+func (acl *Acl) GetUserByGroupId(w http.ResponseWriter, r *http.Request) {
+	var usr interface{}
+
+	userId := chi.URLParam(r, "groupId")
+
+	usr, err := acl.repo.GetUserByGroupId(r.Context(), userId)
+
+	handler.WriteJSONResponse(w, r, usr, http.StatusOK, err)
 }
 
-func (acl *Acl) SetAll(w http.ResponseWriter, r *http.Request) {
-	usrs, err := acl.repo.SetAll(r.Context())
+func (acl *Acl) GetAllGroups(w http.ResponseWriter, r *http.Request) {
+	usrs, err := acl.repo.GetAllGroups(r.Context())
 	handler.WriteJSONResponse(w, r, usrs, http.StatusOK, err)
 }
 
@@ -83,9 +84,9 @@ func (acl *Acl) GetByID(w http.ResponseWriter, r *http.Request) {
 	var usr interface{}
 
 	userId := chi.URLParam(r, "userId")
-	usr, _ = acl.repo.GetByuserId(r.Context(), userId)
+	usr, err := acl.repo.GetByuserId(r.Context(), userId)
 
-	handler.WriteJSONResponse(w, r, usr, http.StatusOK, errors.New("No Errors"))
+	handler.WriteJSONResponse(w, r, usr, http.StatusOK, err)
 }
 func (acl *Acl) Authentication(w http.ResponseWriter, r *http.Request) {
 	var usr model.Auth

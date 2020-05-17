@@ -47,9 +47,15 @@ curl -X GET  http://localhost:9090/webapi/v1/getgroupname/u1
 OUT: {"status":200,"data":[["abc6","u1"],["g1","u1"],["g3","u1"]]}
 
 
-// change permission of files or folders
+ 
+// change permission of files or foldersgooglegoogle
 curl -X PUT -d '{"filefolderPath":"/","filefolderName":"test10.txt","filesOrFolderId":"f" ,"useridOrGroupId":"u2","sessionKey":"abcd","whocallToChange":"sagar","permissionValue":"r"}' http://localhost:9090/webapi/v1/changepermission
 Out: {"status":200,"data":{"Msg":"update success"}}
 
-//get files of all users
+//Get all Groups
+curl -X GET  http://localhost:9090/webapi/v1/getgroups
+{"status":200,"data":[["sagar","abc2"],["sagar","abc5"],["sagar","abc7"],["sagar","abc9"],["u1","abc6"],["u1","abc7"],["u1","g1"],["u1","g3"],["u2","abc6"],["u2","g2"],["u3","g1"],["u4","g2"],["u5","g3"]]}
 
+//Get userID using groupName
+curl -X GET  http://localhost:9090/webapi/v1/getgroups/g3
+{"status":200,"data":[["u1","g3"],["u5","g3"]]}

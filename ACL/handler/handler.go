@@ -14,7 +14,7 @@ type IHTTPHandler interface {
 	Update(http.ResponseWriter, *http.Request)
 	Delete(http.ResponseWriter, *http.Request)
 	GetAll(http.ResponseWriter, *http.Request)
-	SetAll(http.ResponseWriter, *http.Request)
+	GetAllGroups(http.ResponseWriter, *http.Request)
 	GetByuserId(http.ResponseWriter, *http.Request)
 }
 
@@ -59,7 +59,7 @@ func (hdlr *HTTPHandler) Delete(w http.ResponseWriter, r *http.Request) {
 func (hdlr *HTTPHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	return
 }
-func (hdlr *HTTPHandler) SetAll(w http.ResponseWriter, r *http.Request) {
+func (hdlr *HTTPHandler) GetAllGroups(w http.ResponseWriter, r *http.Request) {
 	return
 }
 

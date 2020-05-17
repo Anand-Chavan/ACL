@@ -20,6 +20,11 @@ func (acl *aclRepository) GetByID(cntx context.Context, id string) (interface{},
 	obj := new(model.Acl)
 	return driver.GetById(acl.conn, obj, id)
 }
+
+func (acl *aclRepository) GetUserByGroupId(cntx context.Context, id string) (interface{}, error) {
+	obj := new(model.GetAllGroups)
+	return driver.GetUserByGroupId(acl.conn, obj, id)
+}
 func (acl *aclRepository) GetGroupById(cntx context.Context, id string) (interface{}, error) {
 	obj := new(model.UserAddToGroup)
 	return driver.GetGroupById(acl.conn, obj, id)
@@ -130,7 +135,7 @@ func (acl *aclRepository) GetAll(cntx context.Context) ([]interface{}, error) {
 	obj := &model.Acl{}
 	return driver.GetAll(acl.conn, obj, 0, 0)
 }
-func (acl *aclRepository) SetAll(cntx context.Context) ([]interface{}, error) {
-	obj := &model.Acl{}
-	return driver.GetAll(acl.conn, obj, 0, 0)
+func (acl *aclRepository) GetAllGroups(cntx context.Context) ([]interface{}, error) {
+	obj := &model.GetAllGroups{}
+	return driver.GetAllGroups(acl.conn, obj, 0, 0)
 }
