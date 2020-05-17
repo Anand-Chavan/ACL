@@ -93,8 +93,9 @@ func (filecrt *CreateFileOrFolder) String() string {
 }
 
 type ScanData struct {
-	WritePermissionusr int `json:"id"`
-	WritePermissiongrp int `json:"id"`
+	WritePermissionusr int    `json:"id"`
+	WritePermissiongrp int    `json:"id"`
+	CheckUserType      string `json:"id"`
 }
 
 type GetFilesFold struct {

@@ -178,7 +178,9 @@ func CreateFileFolder(conn *sql.DB, object model.IModel) (sql.Result, error) {
 	// fmt.Println("write permission :", obj1.WritePermissionusr, userid, filefolderPath)
 	_ = conn.QueryRow("select count(*) as count from (select permissionValue from groupPermission where groupName IN (select groupName from userGroupMap where userId='" + userid + "') AND filefolderPath='" + filefolderPath + "' AND permissionValue='w') AS writePermission;").Scan(&obj1.WritePermissiongrp)
 	// fmt.Println("write permission :", obj1.WritePermissiongrp, userid, filefolderPath)
-	if obj1.WritePermissionusr > 0 || obj1.WritePermissiongrp > 0 {
+	_ = conn.QueryRow("select userType from users where userId='" + userid + "';").Scan(&obj1.CheckUserType)
+	fmt.Println(obj1.CheckUserType)
+	if obj1.WritePermissionusr > 0 || obj1.WritePermissiongrp > 0 || obj1.CheckUserType == "s" {
 		var queryBuffer bytes.Buffer
 		queryBuffer.WriteString("INSERT INTO ")
 		queryBuffer.WriteString(object.Table())
@@ -294,7 +296,9 @@ func DeleteFileFolder(conn *sql.DB, object model.IModel) (sql.Result, error) {
 	// fmt.Println("write permission :", obj1.WritePermissionusr, userid, filefolderPath)
 	_ = conn.QueryRow("select count(*) as count from (select permissionValue from groupPermission where groupName IN (select groupName from userGroupMap where userId='" + userid + "') AND filefolderPath='" + filefolderPath + "' AND permissionValue='w') AS writePermission;").Scan(&obj1.WritePermissiongrp)
 	// fmt.Println("write permission :", obj1.WritePermissiongrp, userid, filefolderPath)
-	if obj1.WritePermissionusr > 0 || obj1.WritePermissiongrp > 0 {
+	_ = conn.QueryRow("select userType from users where userId='" + userid + "';").Scan(&obj1.CheckUserType)
+
+	if obj1.WritePermissionusr > 0 || obj1.WritePermissiongrp > 0 || obj1.CheckUserType == "s" {
 		var queryBuffer bytes.Buffer
 		var str = " WHERE filefolderPath='" + filefolderPath + "' AND filefolderName='" + filefolderName + "' ; "
 		queryBuffer.WriteString("DELETE FROM userPermission " + str)
